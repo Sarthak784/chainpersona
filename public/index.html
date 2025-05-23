@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChainPersona - Web3 Wallet Persona Engine</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --primary-glow: #4e54c8;
+      --secondary-glow: #8f94fb;
+      --accent-glow: #00fff2;
+      --sky-blue: #87CEEB;
+      --bg-dark: #0a0b1e;
+      --card-bg-dark: rgba(20, 25, 55, 0.65);
+      --bg-bright: #f5f7fa;
+      --card-bg-bright: rgba(255, 255, 255, 0.9);
+      --text-bright: #2c3e50;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body.dark-theme {
+      background-color: var(--bg-dark);
+      background-image: url('https://images.unsplash.com/photo-1639762681057-408e52192e55?q=80&w=2232&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-blend-mode: overlay;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body.dark-theme::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: linear-gradient(135deg, rgba(10, 11, 30, 0.75), rgba(20, 22, 60, 0.65));
+      z-index: -1;
+    }
+
+    body.bright-theme {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      color: #2c3e50;
+      font-family: 'Rajdhani', sans-serif;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body.bright-theme::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: linear-gradient(135deg, rgba(245, 247, 250, 0.8), rgba(195, 207, 226, 0.6));
+      z-index: -1;
+    }
+
+    .container {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card {
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      margin-bottom: 2rem;
+      overflow: hidden;
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      transform-style: preserve-3d;
+      position: relative;
+    }
+
+    body.dark-theme .card {
+      background-color: var(--card-bg-dark);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    body.bright-theme .card {
+      background-color: rgba(255, 255, 255, 0.9);
+      border-color: rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      color: #2c3e50;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      cursor: pointer;
+      background: var(--primary-glow);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-weight: bold;
+      box-shadow: 0 0 10px var(--primary-glow);
+      transition: background 0.3s ease;
+    }
+
+    .theme-toggle:hover {
+      background: var(--secondary-glow);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 250px;
+      margin-bottom: 1.5rem;
+    }
+
+    .no-chart-message {
+      text-align: center;
+      font-style: italic;
+      color: var(--accent-glow);
+      margin: 1rem 0;
+    }
+
+    body.bright-theme .no-chart-message {
+      color: #3498db;
+    }
+
+    .app-header {
+      margin-bottom: 4rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .app-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 3.8rem;
+      text-shadow: 0 0 15px rgba(135, 206, 235, 0.8);
+      letter-spacing: 2px;
+      margin-top: 20px;
+    }
+
+    .app-title .chain {
+      color: #fff;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+
+    .app-title .persona {
+      color: var(--sky-blue);
+      text-shadow: 0 0 15px rgba(135, 206, 235, 0.8);
+    }
+
+    body.bright-theme .app-title .chain {
+      color: #2c3e50;
+      text-shadow: 0 0 10px rgba(44, 62, 80, 0.3);
+    }
+
+    body.bright-theme .app-title .persona {
+      color: #d4af37;
+      text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    }
+
+    .app-subtitle {
+      color: rgba(220, 220, 255, 0.85);
+      font-size: 1.3rem;
+      font-weight: 400;
+      margin-top: 0.5rem;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    body.bright-theme .app-subtitle {
+      color: #34495e;
+    }
+
+    .card-title {
+      font-family: 'Orbitron', sans-serif;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+    }
+
+    body.bright-theme .card-title {
+      color: #2c3e50;
+    }
+
+    .card-title i {
+      color: var(--accent-glow);
+      margin-right: 10px;
+    }
+
+    .chain-selector {
+      margin-top: 1rem;
+    }
+
+    .chain-options {
+      display: flex;
+      gap: 12px;
+    }
+
+    .chain-option {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      flex: 1;
+      max-width: 100px;
+      position: relative;
+    }
+
+    .chain-option:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-3px);
+    }
+
+    .chain-option.active {
+      background-color: rgba(78, 84, 200, 0.2);
+      border-color: rgba(78, 84, 200, 0.6);
+      box-shadow: 0 0 15px rgba(78, 84, 200, 0.3);
+    }
+
+    body.bright-theme .chain-option {
+      background-color: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      color: #2c3e50;
+    }
+
+    body.bright-theme .chain-option:hover {
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+
+    body.bright-theme .chain-option.active {
+      background-color: rgba(52, 152, 219, 0.2);
+      border-color: rgba(52, 152, 219, 0.6);
+      box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .chain-icon {
+      margin-bottom: 8px;
+    }
+
+    .chain-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .input-group {
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      margin-bottom: 1.5rem;
+    }
+
+    .form-control {
+      background-color: rgba(16, 18, 41, 0.7);
+      border: none;
+      font-family: 'Rajdhani', sans-serif;
+      padding: 0.75rem 1.25rem;
+      color: #fff;
+      font-size: 1.1rem;
+      border-radius: 0;
+    }
+
+    .form-control:focus {
+      background-color: rgba(16, 18, 41, 0.8);
+      box-shadow: none;
+      color: #fff;
+    }
+
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    body.bright-theme .form-control {
+      background-color: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      color: #2c3e50;
+    }
+
+    body.bright-theme .form-control:focus {
+      background-color: rgba(255, 255, 255, 1);
+      border-color: #3498db;
+      color: #2c3e50;
+      box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+    }
+
+    body.bright-theme .form-control::placeholder {
+      color: rgba(44, 62, 80, 0.6);
+    }
+
+    .btn-analyze {
+      background: linear-gradient(45deg, #2a4365, #3182ce);
+      color: white;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: bold;
+      padding: 0.75rem 2rem;
+      border: none;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(49, 130, 206, 0.4);
+      z-index: 10;
+    }
+
+    .btn-analyze:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(49, 130, 206, 0.6);
+      background: linear-gradient(45deg, #3182ce, #4299e1);
+    }
+
+    .loading-container {
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .cyber-spinner {
+      width: 80px;
+      height: 80px;
+      display: inline-block;
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .cyber-spinner::before,
+    .cyber-spinner::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid transparent;
+    }
+
+    .cyber-spinner::before {
+      border-top-color: var(--accent-glow);
+      border-right-color: var(--accent-glow);
+      animation: spin 2s linear infinite;
+    }
+
+    .cyber-spinner::after {
+      border-bottom-color: var(--primary-glow);
+      border-left-color: var(--primary-glow);
+      animation: spin 2s linear infinite reverse;
+    }
+
+    @keyframes spin {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--accent-glow);
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      position: relative;
+    }
+
+    body.bright-theme .loading-text {
+      color: #3498db;
+    }
+
+    .loading-progress {
+      width: 200px;
+      height: 4px;
+      background-color: rgba(255, 255, 255, 0.1);
+      margin: 15px auto;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .loading-progress-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--primary-glow), var(--accent-glow));
+      animation: fill 3s linear infinite;
+    }
+
+    @keyframes fill {
+      0% {
+        width: 0;
+      }
+      100% {
+        width: 100%;
+      }
+    }
+
+    .export-controls {
+      background-color: rgba(16, 18, 41, 0.7);
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    body.bright-theme .export-controls {
+      background-color: rgba(255, 255, 255, 0.8);
+      color: #2c3e50;
+    }
+
+    .export-controls .btn {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      padding: 0.3rem 0.8rem;
+    }
+
+    body.bright-theme .export-controls .btn {
+      color: #2c3e50;
+      border-color: #2c3e50;
+    }
+
+    body.bright-theme .export-controls .btn:hover {
+      background-color: #2c3e50;
+      color: #fff;
+    }
+
+    .card-header {
+      background: linear-gradient(45deg, rgba(78,84,200,0.25), rgba(143,148,251,0.25));
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    body.bright-theme .card-header {
+      background: linear-gradient(45deg, rgba(52, 73, 94, 0.1), rgba(44, 62, 80, 0.1));
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header h5 {
+      font-family: 'Orbitron', sans-serif;
+      margin-bottom: 0;
+      font-size: 1.3rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+    }
+
+    body.bright-theme .card-header h5 {
+      color: #2c3e50;
+    }
+
+    .card-header h5 i {
+      margin-right: 10px;
+      color: var(--accent-glow);
+    }
+
+    .hex-badge {
+      background: rgba(0,255,242,0.15);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 0.9rem;
+      color: var(--accent-glow);
+    }
+
+    body.bright-theme .hex-badge {
+      background: rgba(52, 152, 219, 0.2);
+      color: #3498db;
+    }
+
+    .wallet-address {
+      padding: 0.5rem 1rem;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 50px;
+      font-family: monospace;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      margin: 1rem 0;
+    }
+
+    body.bright-theme .wallet-address {
+      background-color: rgba(52, 73, 94, 0.1);
+      color: #2c3e50;
+    }
+
+    .wallet-address i {
+      margin-right: 8px;
+      color: var(--accent-glow);
+    }
+
+    .score-container {
+      margin-bottom: 2rem;
+    }
+
+    .score-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    body.bright-theme .score-label {
+      color: #2c3e50;
+    }
+
+    .score-label span:last-child {
+      font-weight: bold;
+      color: var(--accent-glow);
+    }
+
+    body.bright-theme .score-label span:last-child {
+      color: #3498db;
+    }
+
+    .progress {
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .progress-bar {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-activity {
+      background: linear-gradient(90deg, #4e54c8, #8f94fb);
+    }
+
+    .progress-security {
+      background: linear-gradient(90deg, #11998e, #38ef7d);
+    }
+
+    .progress-risk {
+      background: linear-gradient(90deg, #f46b45, #eea849);
+    }
+
+    .protocol-list {
+      margin: 0;
+      padding: 0;
+    }
+
+    .protocol-item {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.02);
+      transition: all 0.3s ease;
+    }
+
+    .protocol-item:last-child {
+      border-bottom: none;
+    }
+
+    .protocol-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    body.bright-theme .protocol-item {
+      background: rgba(255, 255, 255, 0.5);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      color: #2c3e50;
+    }
+
+    body.bright-theme .protocol-item:hover {
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .archetype-container {
+      padding: 0.5rem 0;
+    }
+
+    .archetype-item {
+      margin-bottom: 1.2rem;
+    }
+
+    .archetype-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .archetype-name {
+      font-weight: 600;
+    }
+
+    body.bright-theme .archetype-name {
+      color: #2c3e50;
+    }
+
+    .archetype-value {
+      font-weight: bold;
+      color: var(--accent-glow);
+    }
+
+    body.bright-theme .archetype-value {
+      color: #3498db;
+    }
+
+    .archetype-bar {
+      height: 6px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .archetype-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .traits-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 1rem 0;
+    }
+
+    .trait-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50px;
+      padding: 8px 15px;
+      font-size: 0.9rem;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .trait-pill:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    body.bright-theme .trait-pill {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      color: #2c3e50;
+    }
+
+    body.bright-theme .trait-pill:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .recommendation-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .recommendation-item {
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .recommendation-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      padding-left: 1.8rem;
+    }
+
+    .recommendation-item:last-child {
+      border-bottom: none;
+    }
+
+    body.bright-theme .recommendation-item {
+      background: rgba(255, 255, 255, 0.5);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      color: #2c3e50;
+    }
+
+    body.bright-theme .recommendation-item:hover {
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body class="dark-theme">
+  <button class="theme-toggle" id="themeToggle">Switch to Bright Theme</button>
+  <div class="container">
+    <div class="app-header">
+      <h1 class="app-title"><span class="chain">Chain</span><span class="persona">Persona</span></h1>
+      <p class="app-subtitle">Unlock the story behind any Web3 wallet</p>
+    </div>
+
+    <div class="row justify-content-center mb-5">
+      <div class="col-lg-8">
+        <div class="card search-card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-search"></i>
+              Analyze Wallet
+            </h5>
+            <div class="chain-selector mb-4">
+              <h6 class="mb-2">Select Blockchain:</h6>
+              <div class="d-flex chain-options">
+                <div class="chain-option active" data-chain="ethereum">
+                  <div class="chain-icon">
+                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" alt="Ethereum" width="30" />
+                  </div>
+                  <div class="chain-name">Ethereum</div>
+                </div>
+                <div class="chain-option" data-chain="polygon">
+                  <div class="chain-icon">
+                    <img src="https://cryptologos.cc/logos/polygon-matic-logo.svg" alt="Polygon" width="30" />
+                  </div>
+                  <div class="chain-name">Polygon</div>
+                </div>
+                <div class="chain-option" data-chain="bsc">
+                  <div class="chain-icon">
+                    <img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg" alt="BSC" width="30" />
+                  </div>
+                  <div class="chain-name">BSC</div>
+                </div>
+              </div>
+            </div>
+            <div class="input-group">
+              <input type="text" id="wallet-address" class="form-control" placeholder="Enter wallet address (0x...)" />
+              <button class="btn btn-analyze" id="analyze-btn">
+                <i class="fas fa-bolt"></i> ANALYZE
+              </button>
+            </div>
+            <div id="loading" class="loading-container d-none">
+              <div class="cyber-spinner"></div>
+              <div class="loading-progress">
+                <div class="loading-progress-bar"></div>
+              </div>
+              <p class="loading-text">Analyzing on-chain data...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="results-container" class="results-container row d-none">
+      <div class="row mb-4">
+        <div class="col-12 text-end">
+          <div class="export-controls">
+            <span class="me-2 text-light">Export Results:</span>
+            <button id="export-csv" class="btn btn-sm btn-outline-light me-2">
+              <i class="fas fa-file-csv"></i> CSV
+            </button>
+            <button id="export-json" class="btn btn-sm btn-outline-light me-2">
+              <i class="fas fa-file-code"></i> JSON
+            </button>
+            <button id="export-pdf" class="btn btn-sm btn-outline-light">
+              <i class="fas fa-file-pdf"></i> PDF Report
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 fade-in" style="animation-delay: 0s;">
+        <div class="card persona-card">
+          <div class="card-header">
+            <h5>
+              <i class="fas fa-user-circle"></i>
+              Wallet Profile
+            </h5>
+            <span class="hex-badge" id="wallet-type-badge">Power User</span>
+          </div>
+          <div class="card-body">
+            <div class="text-center mb-4">
+              <div class="wallet-address" id="wallet-address-display">
+                <i class="fas fa-wallet"></i>
+                <span>0x1234...5678</span>
+              </div>
+            </div>
+            <div class="score-container">
+              <div class="score-label">
+                <span>Activity Level</span>
+                <span id="activity-level-value">0%</span>
+              </div>
+              <div class="progress">
+                <div id="activity-level" class="progress-bar progress-activity" role="progressbar" style="width: 0%"></div>
+              </div>
+              <div class="score-label">
+                <span>Security Score</span>
+                <span id="security-score-value">0%</span>
+              </div>
+              <div class="progress">
+                <div id="security-score" class="progress-bar progress-security" role="progressbar" style="width: 0%"></div>
+              </div>
+              <div class="score-label">
+                <span>Risk Score</span>
+                <span id="risk-score-value">0%</span>
+              </div>
+              <div class="progress">
+                <div id="risk-score" class="progress-bar progress-risk" role="progressbar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="data-stats">
+              <div class="row text-center">
+                <div class="col-4">
+                  <div class="stat-value" id="tx-count">--</div>
+                  <div class="stat-label">Transactions</div>
+                </div>
+                <div class="col-4">
+                  <div class="stat-value" id="protocols-count">--</div>
+                  <div class="stat-label">Protocols</div>
+                </div>
+                <div class="col-4">
+                  <div class="stat-value" id="tokens-count">--</div>
+                  <div class="stat-label">Tokens</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card persona-card fade-in" style="animation-delay: 0.2s;">
+          <div class="card-header">
+            <h5>
+              <i class="fas fa-project-diagram"></i>
+              Top Protocols
+            </h5>
+          </div>
+          <div class="card-body p-0">
+            <ul class="protocol-list list-unstyled" id="top-protocols">
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 fade-in" style="animation-delay: 0.1s;">
+        <div class="card persona-card">
+          <div class="card-header">
+            <h5>
+              <i class="fas fa-chart-pie"></i>
+              Persona Archetypes
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="archetype-container" id="archetypes-container">
+            </div>
+          </div>
+        </div>
+        <div class="card persona-card fade-in" style="animation-delay: 0.3s;">
+          <div class="card-header">
+            <h5>
+              <i class="fas fa-brain"></i>
+              Behavioral Traits
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="traits-container" id="traits-container">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-12 fade-in" style="animation-delay: 0.2s;">
+        <div class="card persona-card">
+          <div class="card-header">
+            <h5>
+              <i class="fas fa-lightbulb"></i>
+              Recommendations
+            </h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="recommendation-intro p-3 pb-0">
+              <p class="text-muted mb-2">Based on your wallet's persona, we recommend:</p>
+            </div>
+            <ul class="recommendation-list" id="recommendations">
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-12 mt-4 fade-in" style="animation-delay: 0.4s;">
+        <div class="card persona-card">
+          <div class="card-header">
+            <h5>
+              <i class="fas fa-chart-line"></i>
+              Wallet Analytics
+            </h5>
+          </div>
+          <div class="card-body">
+            <div id="charts-container">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentPersonaData = null;
+    let currentChain = 'ethereum';
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const body = document.body;
+      if (body.classList.contains('dark-theme')) {
+        body.classList.remove('dark-theme');
+        body.classList.add('bright-theme');
+        document.getElementById('themeToggle').textContent = 'Switch to Dark Theme';
+      } else {
+        body.classList.remove('bright-theme');
+        body.classList.add('dark-theme');
+        document.getElementById('themeToggle').textContent = 'Switch to Bright Theme';
+      }
+      
+      if (currentPersonaData) {
+        displayCharts(currentPersonaData);
+      }
+    });
+
+    function setupChainSelector() {
+      const chainOptions = document.querySelectorAll('.chain-option');
+      chainOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          chainOptions.forEach(opt => opt.classList.remove('active'));
+          option.classList.add('active');
+          currentChain = option.getAttribute('data-chain');
+          const inputField = document.getElementById('wallet-address');
+          inputField.placeholder = `Enter ${currentChain.charAt(0).toUpperCase() + currentChain.slice(1)} wallet address (0x...)`;
+        });
+      });
+    }
+
+    setupChainSelector();
+
+    document.getElementById('analyze-btn').addEventListener('click', async () => {
+      const walletAddress = document.getElementById('wallet-address').value.trim();
+      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+        alert('Please enter a valid wallet address');
+        return;
+      }
+      document.getElementById('loading').classList.remove('d-none');
+      document.getElementById('results-container').classList.add('d-none');
+      try {
+        const response = await fetch(`/api/persona/${currentChain}/${walletAddress}`);
+        if (!response.ok) throw new Error('Failed to analyze wallet');
+        const persona = await response.json();
+        currentPersonaData = persona;
+        displayPersona(persona);
+        document.getElementById('loading').classList.add('d-none');
+        document.getElementById('results-container').classList.remove('d-none');
+      } catch (error) {
+        alert('Failed to analyze wallet. Please try again.');
+        document.getElementById('loading').classList.add('d-none');
+      }
+    });
+
+    function displayPersona(persona) {
+      document.getElementById('wallet-address-display').innerHTML = `<i class='fas fa-wallet'></i> ${persona.address.substring(0, 6)}...${persona.address.substring(38)}`;
+      document.getElementById('activity-level').style.width = `${persona.activityLevel}%`;
+      document.getElementById('activity-level-value').textContent = `${persona.activityLevel}%`;
+      document.getElementById('security-score').style.width = `${persona.securityScore}%`;
+      document.getElementById('security-score-value').textContent = `${persona.securityScore}%`;
+      document.getElementById('risk-score').style.width = `${persona.riskScore}%`;
+      document.getElementById('risk-score-value').textContent = `${persona.riskScore}%`;
+      
+      const archetypesContainer = document.getElementById('archetypes-container');
+      archetypesContainer.innerHTML = '';
+      Object.entries(persona.archetypes).sort((a, b) => b[1] - a[1]).forEach(([archetype, score]) => {
+        const archetypeEl = document.createElement('div');
+        archetypeEl.className = 'archetype-item';
+        archetypeEl.innerHTML = `<div class='archetype-header'><div class='archetype-name'><i class='fas fa-user'></i> ${archetype}</div><div class='archetype-value'>${score}%</div></div><div class='archetype-bar'><div class='archetype-bar-fill' style='width: ${score}%'></div></div>`;
+        archetypesContainer.appendChild(archetypeEl);
+      });
+      
+      const topProtocolsList = document.getElementById('top-protocols');
+      topProtocolsList.innerHTML = '';
+      persona.topProtocols.forEach(protocol => {
+        const protocolItem = document.createElement('li');
+        protocolItem.className = 'protocol-item';
+        protocolItem.textContent = protocol;
+        topProtocolsList.appendChild(protocolItem);
+      });
+      
+      const traitsContainer = document.getElementById('traits-container');
+      traitsContainer.innerHTML = '';
+      persona.behavioralTraits.forEach(trait => {
+        const traitPill = document.createElement('div');
+        traitPill.className = 'trait-pill';
+        traitPill.textContent = trait;
+        traitsContainer.appendChild(traitPill);
+      });
+      
+      const recommendationsList = document.getElementById('recommendations');
+      recommendationsList.innerHTML = '';
+      persona.recommendedDapps.forEach(dapp => {
+        const recItem = document.createElement('li');
+        recItem.className = 'recommendation-item';
+        recItem.textContent = dapp;
+        recommendationsList.appendChild(recItem);
+      });
+      
+      displayCharts(persona);
+    }
+
+    function displayCharts(persona) {
+      const chartsContainer = document.getElementById('charts-container');
+      chartsContainer.innerHTML = '';
+      
+      if (persona.activityLevel > 0) {
+        const chartRow = document.createElement('div');
+        chartRow.className = 'row';
+        
+        const canvas1Container = document.createElement('div');
+        canvas1Container.className = 'col-lg-6';
+        const canvas1 = document.createElement('canvas');
+        canvas1.id = 'activityTimeChart';
+        canvas1.height = 250;
+        canvas1Container.appendChild(canvas1);
+        chartRow.appendChild(canvas1Container);
+        
+        if (Object.values(persona.archetypes).some(score => score > 0)) {
+          const canvas2Container = document.createElement('div');
+          canvas2Container.className = 'col-lg-6';
+          const canvas2 = document.createElement('canvas');
+          canvas2.id = 'categoryDistribution';
+          canvas2.height = 250;
+          canvas2Container.appendChild(canvas2);
+          chartRow.appendChild(canvas2Container);
+        } else {
+          const msgContainer = document.createElement('div');
+          msgContainer.className = 'col-lg-6';
+          const msg = document.createElement('p');
+          msg.className = 'no-chart-message';
+          msg.textContent = 'Archetype distribution chart not relevant for this wallet.';
+          msgContainer.appendChild(msg);
+          chartRow.appendChild(msgContainer);
+        }
+        
+        chartsContainer.appendChild(chartRow);
+        
+        setTimeout(() => {
+          createActivityChart(persona);
+          if (Object.values(persona.archetypes).some(score => score > 0)) {
+            createDistributionChart(persona);
+          }
+        }, 100);
+      } else {
+        const msg = document.createElement('p');
+        msg.className = 'no-chart-message';
+        msg.textContent = 'Charts not relevant for this wallet - insufficient activity data.';
+        chartsContainer.appendChild(msg);
+      }
+    }
+
+    function createActivityChart(persona) {
+      const isDarkTheme = document.body.classList.contains('dark-theme');
+      const textColor = isDarkTheme ? '#ffffff' : '#2c3e50';
+      const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(44, 62, 80, 0.2)';
+      
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const activityData = months.map(() => Math.floor(Math.random() * 50) + 10);
+      const ctx = document.getElementById('activityTimeChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Transaction Activity',
+            data: activityData,
+            borderColor: '#4e54c8',
+            backgroundColor: 'rgba(78, 84, 200, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Monthly Transaction Activity',
+              color: textColor,
+              font: {
+                family: "'Rajdhani', sans-serif",
+                size: 16
+              }
+            },
+            legend: {
+              display: true,
+              labels: {
+                color: textColor
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                color: gridColor
+              },
+              ticks: {
+                color: textColor
+              }
+            },
+            y: {
+              grid: {
+                color: gridColor
+              },
+              ticks: {
+                color: textColor
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function createDistributionChart(persona) {
+      const isDarkTheme = document.body.classList.contains('dark-theme');
+      const textColor = isDarkTheme ? '#ffffff' : '#2c3e50';
+      
+      const archetypes = Object.entries(persona.archetypes).filter(([_, value]) => value > 0).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      const labels = archetypes.map(([name, _]) => name);
+      const data = archetypes.map(([_, value]) => value);
+      const colors = ['rgba(78, 84, 200, 0.7)', 'rgba(138, 35, 135, 0.7)', 'rgba(75, 108, 183, 0.7)', 'rgba(244, 107, 69, 0.7)', 'rgba(17, 153, 142, 0.7)'];
+      const ctx = document.getElementById('categoryDistribution').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: colors,
+            borderWidth: 2,
+            borderColor: isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(44, 62, 80, 0.1)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Persona Archetype Distribution',
+              color: textColor,
+              font: {
+                family: "'Rajdhani', sans-serif",
+                size: 16
+              }
+            },
+            legend: {
+              position: 'right',
+              labels: {
+                color: textColor,
+                font: {
+                  family: "'Rajdhani', sans-serif"
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function exportAsCSV() {
+      if (!currentPersonaData) return;
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Category,Value\n";
+      csvContent += `Address,${currentPersonaData.address}\n`;
+      csvContent += `Activity Level,${currentPersonaData.activityLevel}\n`;
+      csvContent += `Risk Score,${currentPersonaData.riskScore}\n`;
+      csvContent += `Security Score,${currentPersonaData.securityScore}\n`;
+      csvContent += "\nArchetypes:\n";
+      Object.entries(currentPersonaData.archetypes).forEach(([key, value]) => {
+        csvContent += `${key},${value}\n`;
+      });
+      csvContent += "\nTop Protocols:\n";
+      currentPersonaData.topProtocols.forEach(protocol => {
+        csvContent += `${protocol},-\n`;
+      });
+      csvContent += "\nBehavioral Traits:\n";
+      currentPersonaData.behavioralTraits.forEach(trait => {
+        csvContent += `${trait},-\n`;
+      });
+      csvContent += "\nRecommended DApps:\n";
+      currentPersonaData.recommendedDapps.forEach(dapp => {
+        csvContent += `${dapp},-\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `chainpersona_${currentPersonaData.address.substring(0, 6)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function exportAsJSON() {
+      if (!currentPersonaData) return;
+      const jsonContent = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentPersonaData, null, 2));
+      const link = document.createElement("a");
+      link.setAttribute("href", jsonContent);
+      link.setAttribute("download", `chainpersona_${currentPersonaData.address.substring(0, 6)}.json`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function exportAsPDF() {
+      if (!currentPersonaData) return;
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      doc.setFontSize(20);
+      doc.setTextColor(40, 40, 40);
+      doc.text("ChainPersona Wallet Analysis", 20, 20);
+      
+      doc.setFontSize(12);
+      doc.text(`Address: ${currentPersonaData.address}`, 20, 35);
+      doc.text(`Chain: ${currentChain.toUpperCase()}`, 20, 45);
+      doc.text(`Activity Level: ${currentPersonaData.activityLevel}%`, 20, 55);
+      doc.text(`Security Score: ${currentPersonaData.securityScore}%`, 20, 65);
+      doc.text(`Risk Score: ${currentPersonaData.riskScore}%`, 20, 75);
+      
+      doc.setFontSize(14);
+      doc.text("Persona Archetypes:", 20, 90);
+      doc.setFontSize(10);
+      let y = 100;
+      Object.entries(currentPersonaData.archetypes).forEach(([key, value]) => {
+        doc.text(`${key}: ${value}%`, 25, y);
+        y += 10;
+      });
+      
+      y += 10;
+      doc.setFontSize(14);
+      doc.text("Top Protocols:", 20, y);
+      y += 10;
+      doc.setFontSize(10);
+      currentPersonaData.topProtocols.forEach(protocol => {
+        doc.text(`• ${protocol}`, 25, y);
+        y += 8;
+      });
+      
+      y += 10;
+      doc.setFontSize(14);
+      doc.text("Behavioral Traits:", 20, y);
+      y += 10;
+      doc.setFontSize(10);
+      currentPersonaData.behavioralTraits.forEach(trait => {
+        doc.text(`• ${trait}`, 25, y);
+        y += 8;
+      });
+      
+      y += 10;
+      doc.setFontSize(14);
+      doc.text("Recommended DApps:", 20, y);
+      y += 10;
+      doc.setFontSize(10);
+      currentPersonaData.recommendedDapps.forEach(dapp => {
+        doc.text(`• ${dapp}`, 25, y);
+        y += 8;
+      });
+      
+      doc.setFontSize(8);
+      doc.setTextColor(128, 128, 128);
+      doc.text("Generated by ChainPersona - Web3 Wallet Analysis Tool", 20, 280);
+      doc.text(`Report generated on: ${new Date().toLocaleString()}`, 20, 285);
+      
+      doc.save(`chainpersona_${currentPersonaData.address.substring(0, 6)}.pdf`);
+    }
+
+    document.getElementById('export-csv').addEventListener('click', exportAsCSV);
+    document.getElementById('export-json').addEventListener('click', exportAsJSON);
+    document.getElementById('export-pdf').addEventListener('click', exportAsPDF);
+  </script>
+</body>
+</html>
