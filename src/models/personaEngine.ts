@@ -90,20 +90,19 @@ export class PersonaEngine {
     const total = Object.values(archetypes).reduce((sum, score) => sum + score, 0);
     
     if (total === 0) {
-      // Instead of equal distribution, set a default pattern for inactive wallets
       return {
-        [PersonaArchetype.LONG_TERM_INVESTOR]: 60,
-        [PersonaArchetype.DEFI_USER]: 20,
-        [PersonaArchetype.TRADER]: 10,
-        [PersonaArchetype.NFT_COLLECTOR]: 5,
-        [PersonaArchetype.GOVERNANCE_PARTICIPANT]: 3,
-        [PersonaArchetype.DEVELOPER]: 1,
-        [PersonaArchetype.GAMING_ENTHUSIAST]: 1,
+        [PersonaArchetype.LONG_TERM_INVESTOR]: 60.00,
+        [PersonaArchetype.DEFI_USER]: 20.00,
+        [PersonaArchetype.TRADER]: 10.00,
+        [PersonaArchetype.NFT_COLLECTOR]: 5.00,
+        [PersonaArchetype.GOVERNANCE_PARTICIPANT]: 3.00,
+        [PersonaArchetype.DEVELOPER]: 1.00,
+        [PersonaArchetype.GAMING_ENTHUSIAST]: 1.00,
       };
     }
     
     Object.keys(archetypes).forEach(key => {
-      archetypes[key as PersonaArchetype] = Math.round((archetypes[key as PersonaArchetype] / total) * 100);
+      archetypes[key as PersonaArchetype] = parseFloat(((archetypes[key as PersonaArchetype] / total) * 100).toFixed(2));
     });
     
     return archetypes;
