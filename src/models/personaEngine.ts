@@ -62,7 +62,27 @@ export class PersonaEngine {
     this.identifyBehavioralTraits(persona, transactions, contractInteractions);
     this.generateRecommendations(persona);
     
+    persona.archetypes = this.normalizeArchetypes(persona.archetypes);
+    
     return persona;
+  }
+  
+  private normalizeArchetypes(archetypes: Record<PersonaArchetype, number>): Record<PersonaArchetype, number> {
+    const total = Object.values(archetypes).reduce((sum, score) => sum + score, 0);
+    
+    if (total === 0) {
+      const defaultScore = Math.round(100 / Object.keys(archetypes).length);
+      Object.keys(archetypes).forEach(key => {
+        archetypes[key as PersonaArchetype] = defaultScore;
+      });
+      return archetypes;
+    }
+    
+    Object.keys(archetypes).forEach(key => {
+      archetypes[key as PersonaArchetype] = Math.round((archetypes[key as PersonaArchetype] / total) * 100);
+    });
+    
+    return archetypes;
   }
   
   private initializeArchetypes(): Record<PersonaArchetype, number> {

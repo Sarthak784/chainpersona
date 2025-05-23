@@ -632,6 +632,7 @@
       border-radius: 3px;
       position: relative;
       overflow: hidden;
+      background: linear-gradient(90deg, var(--primary-glow), var(--accent-glow));
     }
 
     .traits-container {
@@ -740,19 +741,19 @@
               <div class="d-flex chain-options">
                 <div class="chain-option active" data-chain="ethereum">
                   <div class="chain-icon">
-                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" alt="Ethereum" width="30" />
+                    <span style="font-size: 30px;">⟠</span>
                   </div>
                   <div class="chain-name">Ethereum</div>
                 </div>
                 <div class="chain-option" data-chain="polygon">
                   <div class="chain-icon">
-                    <img src="https://cryptologos.cc/logos/polygon-matic-logo.svg" alt="Polygon" width="30" />
+                    <span style="font-size: 30px;">🔷</span>
                   </div>
                   <div class="chain-name">Polygon</div>
                 </div>
                 <div class="chain-option" data-chain="bsc">
                   <div class="chain-icon">
-                    <img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg" alt="BSC" width="30" />
+                    <span style="font-size: 30px;">🟡</span>
                   </div>
                   <div class="chain-name">BSC</div>
                 </div>
@@ -831,22 +832,6 @@
               </div>
               <div class="progress">
                 <div id="risk-score" class="progress-bar progress-risk" role="progressbar" style="width: 0%"></div>
-              </div>
-            </div>
-            <div class="data-stats">
-              <div class="row text-center">
-                <div class="col-4">
-                  <div class="stat-value" id="tx-count">--</div>
-                  <div class="stat-label">Transactions</div>
-                </div>
-                <div class="col-4">
-                  <div class="stat-value" id="protocols-count">--</div>
-                  <div class="stat-label">Protocols</div>
-                </div>
-                <div class="col-4">
-                  <div class="stat-value" id="tokens-count">--</div>
-                  <div class="stat-label">Tokens</div>
-                </div>
               </div>
             </div>
           </div>
