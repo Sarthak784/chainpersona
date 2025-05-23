@@ -23,21 +23,40 @@ export interface WalletPersona {
 
 export class PersonaEngine {
   private dataCollector: IDataCollector;
+  private chainType: string;
   
-  private protocols: Record<string, { name: string; category: string }> = {
-    '0x7a250d5630b4cf539739df2c5dacb4c659f2488d': { name: 'Uniswap V2', category: 'defi' },
-    '0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45': { name: 'Uniswap V3', category: 'defi' },
-    '0x00000000219ab540356cbb839cbe05303d7705fa': { name: 'Ethereum 2.0 Deposit', category: 'staking' },
-    '0x7be8076f4ea4a4ad08075c2508e481d6c946d12b': { name: 'OpenSea', category: 'nft' },
-    '0x7f268357a8c2552623316e2562d90e642bb538e5': { name: 'Rarible', category: 'nft' },
-    '0x06012c8cf97bead5deae237070f9587f8e7a266d': { name: 'CryptoKitties', category: 'gaming' },
-    '0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb': { name: 'CryptoPunks', category: 'nft' },
-    '0xc0da01a04c3f3e0be433606045bb7017a7323e38': { name: 'Compound Governance', category: 'governance' },
-    '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2': { name: 'Maker', category: 'governance' },
+  private protocols: Record<string, Record<string, { name: string; category: string }>> = {
+    ethereum: {
+      '0x7a250d5630b4cf539739df2c5dacb4c659f2488d': { name: 'Uniswap V2', category: 'defi' },
+      '0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45': { name: 'Uniswap V3', category: 'defi' },
+      '0x00000000219ab540356cbb839cbe05303d7705fa': { name: 'Ethereum 2.0 Deposit', category: 'staking' },
+      '0x7be8076f4ea4a4ad08075c2508e481d6c946d12b': { name: 'OpenSea', category: 'nft' },
+      '0x7f268357a8c2552623316e2562d90e642bb538e5': { name: 'Rarible', category: 'nft' },
+      '0x06012c8cf97bead5deae237070f9587f8e7a266d': { name: 'CryptoKitties', category: 'gaming' },
+      '0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb': { name: 'CryptoPunks', category: 'nft' },
+      '0xc0da01a04c3f3e0be433606045bb7017a7323e38': { name: 'Compound Governance', category: 'governance' },
+      '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2': { name: 'Maker', category: 'governance' },
+    },
+    polygon: {
+      '0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff': { name: 'QuickSwap', category: 'defi' },
+      '0x1b02da8cb0d097eb8d57a175b88c7d8b47997506': { name: 'SushiSwap', category: 'defi' },
+      '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063': { name: 'Aave Polygon', category: 'defi' },
+      '0x2791bca1f2de4661ed88a30c99a7a9449aa84174': { name: 'USDC Polygon', category: 'defi' },
+      '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270': { name: 'WMATIC', category: 'defi' },
+      '0x60ae616a2155ee3d9a68541ba4544862310933d4': { name: 'OpenSea Polygon', category: 'nft' },
+    },
+    bsc: {
+      '0x10ed43c718714eb63d5aa57b78b54704e256024e': { name: 'PancakeSwap V2', category: 'defi' },
+      '0x13f4ea83d0bd40e75c8222255bc855a974568dd4': { name: 'PancakeSwap V3', category: 'defi' },
+      '0x58f876857a02d6762e0101bb5c46a8c1ed44dc16': { name: 'Venus', category: 'defi' },
+      '0x55d398326f99059ff775485246999027b3197955': { name: 'USDT BSC', category: 'defi' },
+      '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c': { name: 'WBNB', category: 'defi' },
+    }
   };
 
   constructor(dataCollector: IDataCollector) {
     this.dataCollector = dataCollector;
+    this.chainType = dataCollector.getChainType();
   }
 
   async generatePersona(address: string): Promise<WalletPersona> {
@@ -71,11 +90,16 @@ export class PersonaEngine {
     const total = Object.values(archetypes).reduce((sum, score) => sum + score, 0);
     
     if (total === 0) {
-      const defaultScore = Math.round(100 / Object.keys(archetypes).length);
-      Object.keys(archetypes).forEach(key => {
-        archetypes[key as PersonaArchetype] = defaultScore;
-      });
-      return archetypes;
+      // Instead of equal distribution, set a default pattern for inactive wallets
+      return {
+        [PersonaArchetype.LONG_TERM_INVESTOR]: 60,
+        [PersonaArchetype.DEFI_USER]: 20,
+        [PersonaArchetype.TRADER]: 10,
+        [PersonaArchetype.NFT_COLLECTOR]: 5,
+        [PersonaArchetype.GOVERNANCE_PARTICIPANT]: 3,
+        [PersonaArchetype.DEVELOPER]: 1,
+        [PersonaArchetype.GAMING_ENTHUSIAST]: 1,
+      };
     }
     
     Object.keys(archetypes).forEach(key => {
@@ -110,9 +134,11 @@ export class PersonaEngine {
   }
   
   private identifyTopProtocols(contractInteractions: any[]): string[] {
-    if (!contractInteractions.length) return [];
+    if (!contractInteractions.length) return ['No protocol interactions found'];
     
+    const chainProtocols = this.protocols[this.chainType] || {};
     const interactionCounts: Record<string, number> = {};
+    
     contractInteractions.forEach(tx => {
       const address = tx.to?.toLowerCase();
       if (address) {
@@ -125,7 +151,7 @@ export class PersonaEngine {
     ).slice(0, 5);
     
     return sortedAddresses.map(addr => 
-      this.protocols[addr]?.name || `Unknown Protocol (${addr.substring(0, 8)}...)`
+      chainProtocols[addr]?.name || `Unknown Protocol (${addr.substring(0, 8)}...)`
     );
   }
   
@@ -195,11 +221,12 @@ export class PersonaEngine {
   private analyzeContractInteractions(persona: WalletPersona, contractInteractions: any[]): void {
     if (!contractInteractions.length) return;
     
+    const chainProtocols = this.protocols[this.chainType] || {};
     const categoryCounts: Record<string, number> = {};
     
     contractInteractions.forEach(tx => {
       const address = tx.to?.toLowerCase();
-      const protocol = this.protocols[address];
+      const protocol = chainProtocols[address];
       
       if (protocol) {
         categoryCounts[protocol.category] = (categoryCounts[protocol.category] || 0) + 1;
@@ -234,6 +261,12 @@ export class PersonaEngine {
     contractInteractions: any[]
   ): void {
     const traits: string[] = [];
+    
+    if (transactions.length === 0) {
+      traits.push('Inactive on this chain');
+      persona.behavioralTraits = traits;
+      return;
+    }
     
     if (persona.riskScore > 70) {
       traits.push('High Risk Tolerance');
