@@ -17,6 +17,10 @@ export class MultiChainDataCollector implements IDataCollector {
     this.provider = new ethers.providers.JsonRpcProvider(providerUrl);
   }
 
+  getChainType(): string {
+    return this.chainType;
+  }
+
   async getWalletTransactions(address: string, limit: number = 100): Promise<any[]> {
     try {
       if (this.chainType === 'ethereum') {
@@ -168,9 +172,5 @@ export class MultiChainDataCollector implements IDataCollector {
       console.error(`Error fetching ${this.chainType} contract interactions:`, error);
       return [];
     }
-  }
-
-  getChainType(): string {
-    return this.chainType;
   }
 }
