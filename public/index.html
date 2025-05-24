@@ -23,6 +23,7 @@
       --card-bg-bright: rgba(255, 255, 255, 0.9);
       --text-bright: #2c3e50;
       --ai-glow: #ff6b6b;
+      --pro-gradient: linear-gradient(45deg, #ff6b6b, #ff8e53);
     }
 
     * {
@@ -105,6 +106,11 @@
       border-color: rgba(0, 0, 0, 0.1);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
       color: #2c3e50;
+    }
+
+    .pro-card {
+      border: 2px solid #ff6b6b !important;
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 142, 83, 0.1)) !important;
     }
 
     .theme-toggle {
@@ -240,12 +246,13 @@
       animation: aiPulse 2s infinite;
     }
 
+    /* Enhanced Smart Chatbot Styles */
     .chat-container {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      width: 350px;
-      height: 500px;
+      width: 400px;
+      height: 600px;
       background: var(--card-bg-dark);
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.15);
@@ -253,32 +260,54 @@
       display: none;
       flex-direction: column;
       z-index: 1000;
+      transition: all 0.3s ease;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
 
     body.bright-theme .chat-container {
       background: rgba(255, 255, 255, 0.95);
       border-color: rgba(0, 0, 0, 0.1);
       color: #2c3e50;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     }
 
     .chat-header {
-      padding: 1rem;
+      padding: 1rem 1.5rem;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: linear-gradient(45deg, rgba(255, 107, 107, 0.2), rgba(255, 142, 83, 0.1));
+      border-radius: 20px 20px 0 0;
+    }
+
+    .chat-header h6 {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+
+    .chat-header h6 i {
+      margin-right: 8px;
+      animation: aiPulse 2s infinite;
+    }
+
+    .chat-controls {
+      display: flex;
+      gap: 10px;
     }
 
     .chat-messages {
       flex: 1;
-      padding: 1rem;
+      padding: 1.5rem;
       overflow-y: auto;
-      max-height: 350px;
+      max-height: 450px;
     }
 
     .chat-input-container {
-      padding: 1rem;
+      padding: 1rem 1.5rem;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
@@ -287,9 +316,10 @@
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 20px;
-      padding: 10px 15px;
+      padding: 12px 18px;
       color: #fff;
       font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
     }
 
     body.bright-theme .chat-input {
@@ -300,9 +330,15 @@
 
     .chat-message {
       margin-bottom: 1rem;
-      padding: 0.5rem 1rem;
+      padding: 0.8rem 1.2rem;
       border-radius: 15px;
-      max-width: 80%;
+      max-width: 85%;
+      animation: fadeInMessage 0.3s ease-out;
+    }
+
+    @keyframes fadeInMessage {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .chat-message.user {
@@ -310,33 +346,64 @@
       color: white;
       margin-left: auto;
       text-align: right;
+      border-bottom-right-radius: 5px;
     }
 
     .chat-message.ai {
       background: rgba(255, 107, 107, 0.2);
       border: 1px solid rgba(255, 107, 107, 0.3);
+      border-bottom-left-radius: 5px;
     }
 
+    /* Enhanced Smart Chat Toggle Button */
     .chat-toggle {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      width: 60px;
-      height: 60px;
+      width: 90px;
+      height: 90px;
       background: linear-gradient(45deg, var(--ai-glow), #ff8e53);
       border: none;
       border-radius: 50%;
       color: white;
-      font-size: 1.5rem;
+      font-size: 2.2rem;
       cursor: pointer;
-      box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
       transition: all 0.3s ease;
       z-index: 1001;
+      display: none; /* Hidden by default */
+      animation: bounceIn 0.6s ease-out;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
     }
 
     .chat-toggle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 30px rgba(255, 107, 107, 0.7);
+    }
+
+    .chat-toggle.show {
+      display: block;
+    }
+
+    .minimize-btn, .close-btn {
+      background: transparent;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 5px 8px;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .minimize-btn:hover, .close-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
       transform: scale(1.1);
-      box-shadow: 0 6px 25px rgba(255, 107, 107, 0.6);
     }
 
     .wallet-input-container {
@@ -497,6 +564,21 @@
       transform: translateY(-2px);
       box-shadow: 0 0 15px rgba(49, 130, 206, 0.6);
       background: linear-gradient(45deg, #3182ce, #4299e1);
+    }
+
+    .btn-pro {
+      background: var(--pro-gradient) !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 25px !important;
+      padding: 12px 30px !important;
+      font-weight: bold !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .btn-pro:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4) !important;
     }
 
     .loading-container {
@@ -943,6 +1025,298 @@
     body.bright-theme .transaction-pattern {
       background: rgba(0, 0, 0, 0.05);
     }
+
+    .pro-feature-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .pro-feature-list li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .pro-feature-list li:last-child {
+      border-bottom: none;
+    }
+
+    .chat-suggestion {
+      margin: 0.5rem 0;
+      padding: 0.8rem;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 107, 107, 0.2);
+    }
+
+    .chat-suggestion:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    .analysis-summary {
+      background: linear-gradient(135deg, rgba(0, 255, 242, 0.1), rgba(78, 84, 200, 0.1));
+      border: 1px solid rgba(0, 255, 242, 0.3);
+      border-radius: 12px;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+
+    /* Enhanced Transaction History Styles */
+    .transaction-table {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    body.bright-theme .transaction-table {
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .transaction-table th {
+      background: rgba(78, 84, 200, 0.2);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      padding: 1rem 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    body.bright-theme .transaction-table th {
+      background: rgba(52, 73, 94, 0.1);
+      color: #2c3e50;
+    }
+
+    .transaction-table td {
+      border: none;
+      padding: 0.75rem;
+      vertical-align: middle;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    body.bright-theme .transaction-table td {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      color: #2c3e50;
+    }
+
+    .transaction-row {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .transaction-row:hover {
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateX(5px);
+    }
+
+    body.bright-theme .transaction-row:hover {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .transaction-hash {
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--accent-glow);
+      text-decoration: none;
+    }
+
+    .transaction-hash:hover {
+      text-decoration: underline;
+    }
+
+    body.bright-theme .transaction-hash {
+      color: #3498db;
+    }
+
+    .transaction-type {
+      padding: 0.25rem 0.5rem;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .transaction-type.external {
+      background: rgba(52, 152, 219, 0.2);
+      color: #3498db;
+    }
+
+    .transaction-type.internal {
+      background: rgba(155, 89, 182, 0.2);
+      color: #9b59b6;
+    }
+
+    .transaction-type.erc20 {
+      background: rgba(46, 204, 113, 0.2);
+      color: #2ecc71;
+    }
+
+    .transaction-address {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    body.bright-theme .transaction-address {
+      color: rgba(44, 62, 80, 0.8);
+    }
+
+    .protocol-name {
+      color: var(--accent-glow) !important;
+      font-weight: 600;
+      font-family: 'Rajdhani', sans-serif !important;
+    }
+
+    body.bright-theme .protocol-name {
+      color: #3498db !important;
+    }
+
+    /* Enhanced value display styles */
+    .transaction-value {
+      font-weight: 600;
+    }
+
+    .transaction-value.eth-transfer {
+      color: var(--accent-glow);
+      font-weight: 700;
+    }
+
+    .transaction-value.contract-call {
+      color: #9b59b6;
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+
+    .transaction-value.zero-value {
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.85rem;
+    }
+
+    .transaction-value.token-transfer {
+      color: #2ecc71;
+      font-weight: 600;
+    }
+
+    body.bright-theme .transaction-value.eth-transfer {
+      color: #27ae60;
+    }
+
+    body.bright-theme .transaction-value.contract-call {
+      color: #8e44ad;
+    }
+
+    body.bright-theme .transaction-value.zero-value {
+      color: rgba(44, 62, 80, 0.4);
+    }
+
+    body.bright-theme .transaction-value.token-transfer {
+      color: #27ae60;
+    }
+
+    .transaction-gas {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    body.bright-theme .transaction-gas {
+      color: rgba(44, 62, 80, 0.7);
+    }
+
+    .transaction-age {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    body.bright-theme .transaction-age {
+      color: rgba(44, 62, 80, 0.6);
+    }
+
+    .transaction-status {
+      padding: 0.25rem 0.5rem;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .transaction-status.success {
+      background: rgba(46, 204, 113, 0.2);
+      color: #2ecc71;
+    }
+
+    .transaction-status.failed {
+      background: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+    }
+
+    .transaction-filters .form-control {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    body.bright-theme .transaction-filters .form-control {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      color: #2c3e50;
+    }
+
+    .transaction-stats {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+
+    body.bright-theme .transaction-stats {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .stat-item h6 {
+      color: var(--accent-glow);
+      font-size: 1.2rem;
+      margin-bottom: 0.25rem;
+    }
+
+    body.bright-theme .stat-item h6 {
+      color: #3498db;
+    }
+
+    .stat-item small {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.8rem;
+    }
+
+    body.bright-theme .stat-item small {
+      color: rgba(44, 62, 80, 0.7);
+    }
+
+    .no-transactions {
+      padding: 2rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    body.bright-theme .no-transactions {
+      color: rgba(44, 62, 80, 0.5);
+    }
+
+    .pagination .page-link {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    body.bright-theme .pagination .page-link {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      color: #2c3e50;
+    }
+
+    .pagination .page-item.active .page-link {
+      background: var(--primary-glow);
+      border-color: var(--primary-glow);
+    }
   </style>
 </head>
 <body class="dark-theme">
@@ -1018,7 +1392,7 @@
           <div class="export-controls">
             <span class="me-2 text-light">Export Results:</span>
             <button id="export-pdf" class="btn btn-sm btn-outline-light">
-              <i class="fas fa-file-pdf"></i> PDF Report with Charts
+              <i class="fas fa-file-pdf"></i> Export as PDF
             </button>
           </div>
         </div>
@@ -1113,6 +1487,20 @@
           </div>
         </div>
         
+        <div class="card persona-card fade-in" style="animation-delay: 0.25s;">
+          <div class="card-header">
+            <h5>
+              <i class="fas fa-robot"></i>
+              AI General Insights
+            </h5>
+          </div>
+          <div class="card-body">
+            <div id="ai-general-insights">
+              <p>Analyze a wallet to see AI-powered insights...</p>
+            </div>
+          </div>
+        </div>
+        
         <div class="card persona-card fade-in" style="animation-delay: 0.3s;">
           <div class="card-header">
             <h5>
@@ -1147,6 +1535,9 @@
               <h6><i class="fas fa-robot"></i> AI Recommendations</h6>
             </div>
             <ul class="recommendation-list" id="ai-recommendations">
+              <li class="recommendation-item">
+                <i class="fas fa-robot"></i> Upgrade to ChainPersona Pro for AI-powered recommendations
+              </li>
             </ul>
           </div>
         </div>
@@ -1161,8 +1552,118 @@
           <div class="card-body">
             <div id="security-analysis-container">
               <div class="security-alert medium">
-                <h6><i class="fas fa-shield-alt"></i> Threat Level: Analyzing...</h6>
-                <p><strong>Security Score:</strong> Calculating...</p>
+                <h6><i class="fas fa-lock"></i> Advanced Security Analysis</h6>
+                <p><strong>🚀 ChainPersona Pro Feature</strong></p>
+                <p>Get detailed threat detection, vulnerability scanning, and personalized security recommendations.</p>
+                <button class="btn btn-sm btn-outline-light" onclick="scrollToProCard()">Upgrade to Pro</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enhanced Transaction History Card -->
+      <div class="col-lg-12 mt-4 fade-in" style="animation-delay: 0.6s;">
+        <div class="card persona-card">
+          <div class="card-header">
+            <h5>
+              <i class="fas fa-history"></i>
+              Transaction History
+            </h5>
+            <span class="hex-badge" id="transaction-count-badge">0 Transactions</span>
+          </div>
+          <div class="card-body">
+            <div class="transaction-filters mb-3">
+              <div class="row">
+                <div class="col-md-6">
+                  <select class="form-control" id="transaction-filter">
+                    <option value="all">All Transactions</option>
+                    <option value="external">External Transfers</option>
+                    <option value="internal">Contract Interactions</option>
+                    <option value="erc20">Token Transfers</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="transaction-search" placeholder="Search by hash, address...">
+                    <button class="btn btn-outline-secondary" type="button" id="clear-search">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="transaction-stats mb-3">
+              <div class="row text-center">
+                <div class="col-md-3">
+                  <div class="stat-item">
+                    <h6 id="total-transactions">0</h6>
+                    <small>Total Transactions</small>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-item">
+                    <h6 id="total-volume">$0.00</h6>
+                    <small>Total Volume</small>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-item">
+                    <h6 id="avg-gas">0</h6>
+                    <small>Avg Gas Used</small>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-item">
+                    <h6 id="unique-contracts">0</h6>
+                    <small>Unique Contracts</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="transaction-list-container">
+              <div class="table-responsive">
+                <table class="table transaction-table">
+                  <thead>
+                    <tr>
+                      <th>Hash</th>
+                      <th>Type</th>
+                      <th>From/To</th>
+                      <th>Value</th>
+                      <th>Gas</th>
+                      <th>Age</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="transaction-table-body">
+                    <tr>
+                      <td colspan="7" class="text-center">
+                        <div class="no-transactions">
+                          <i class="fas fa-search fa-2x mb-2"></i>
+                          <p>Analyze a wallet to see transaction history</p>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <div class="transaction-pagination d-none" id="transaction-pagination">
+                <nav>
+                  <ul class="pagination justify-content-center">
+                    <li class="page-item" id="prev-page">
+                      <a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a>
+                    </li>
+                    <li class="page-item active" id="current-page">
+                      <a class="page-link" href="#">1</a>
+                    </li>
+                    <li class="page-item" id="next-page">
+                      <a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>
+                    </li>
+                  </ul>
+                </nav>
               </div>
             </div>
           </div>
@@ -1181,6 +1682,70 @@
             <div id="charts-container">
             </div>
             <div id="portfolio-optimization" class="portfolio-optimization">
+              <h6><i class="fas fa-chart-line"></i> AI Portfolio Optimization</h6>
+              <div class="ai-insights">
+                <p><strong>
+                🚀 ChainPersona Pro Feature</strong></p>
+                <p>Get AI-powered portfolio rebalancing, yield optimization strategies, and risk management recommendations.</p>
+                <button class="btn btn-sm btn-outline-light" onclick="scrollToProCard()">Upgrade to Pro</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ChainPersona Pro Card -->
+      <div class="col-lg-12 mt-4 fade-in" style="animation-delay: 0.5s;" id="pro-card">
+        <div class="card persona-card pro-card">
+          <div class="card-header" style="background: linear-gradient(45deg, rgba(255, 107, 107, 0.3), rgba(255, 142, 83, 0.2));">
+            <h5>
+              <i class="fas fa-crown" style="color: #ffd700;"></i>
+              ChainPersona AI Pro - Coming Soon
+            </h5>
+            <span class="hex-badge" style="background: #ff6b6b; color: white;">Premium</span>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h6><i class="fas fa-shield-alt"></i> Advanced Security</h6>
+                <ul class="pro-feature-list">
+                  <li>🔍 Real-time threat detection</li>
+                  <li>🛡️ Vulnerability scanning</li>
+                  <li>⚠️ Risk scoring algorithms</li>
+                  <li>📊 Security trend analysis</li>
+                </ul>
+                
+                <h6><i class="fas fa-chart-line"></i> Portfolio Intelligence</h6>
+                <ul class="pro-feature-list">
+                  <li>📈 AI-powered rebalancing</li>
+                  <li>💰 Yield optimization</li>
+                  <li>🎯 Risk management</li>
+                  <li>📊 Performance analytics</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6><i class="fas fa-comments"></i> Unlimited AI Chat</h6>
+                <ul class="pro-feature-list">
+                  <li>💬 Unlimited conversations</li>
+                  <li>🤖 Advanced AI insights</li>
+                  <li>📚 Strategy recommendations</li>
+                  <li>🔄 Real-time market context</li>
+                </ul>
+                
+                <h6><i class="fas fa-star"></i> Premium Features</h6>
+                <ul class="pro-feature-list">
+                  <li>📱 Multi-chain analysis</li>
+                  <li>📊 Historical tracking</li>
+                  <li>🎨 Custom reports</li>
+                  <li>⚡ Priority support</li>
+                </ul>
+              </div>
+            </div>
+            <div class="text-center mt-4">
+              <button class="btn btn-lg btn-pro">
+                <i class="fas fa-rocket"></i> Get Early Access - Coming Soon!
+              </button>
+              <p class="mt-2" style="color: rgba(255,255,255,0.7);">Be the first to experience next-gen Web3 analytics</p>
             </div>
           </div>
         </div>
@@ -1188,6 +1753,7 @@
     </div>
   </div>
 
+  <!-- Smart Chatbot - Only appears after analysis -->
   <button class="chat-toggle" id="chat-toggle">
     <i class="fas fa-comments"></i>
   </button>
@@ -1195,17 +1761,25 @@
   <div class="chat-container" id="chat-container">
     <div class="chat-header">
       <h6><i class="fas fa-robot"></i> ChainSage AI</h6>
-      <button class="btn btn-sm" id="close-chat">
-        <i class="fas fa-times"></i>
-      </button>
+      <div class="chat-controls">
+        <button class="minimize-btn" id="minimize-chat" title="Minimize Chat">−</button>
+        <button class="close-btn" id="close-chat" title="Close Chat">×</button>
+      </div>
     </div>
     <div class="chat-messages" id="chat-messages">
       <div class="chat-message ai">
-        <p>🚀 <strong>Welcome to ChainSage!</strong> I'm your personal Web3 intelligence companion, ready to decode the mysteries of your wallet's blockchain journey. Ask me anything about your DeFi strategies, risk patterns, or hidden opportunities!</p>
+        <p>🚀 <strong>Analysis Complete!</strong> I'm ChainSage, your personal Web3 intelligence companion. I have full access to your wallet analysis and can answer specific questions about your:</p>
+        <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+          <li>Trading patterns & behavior</li>
+          <li>Risk assessment & security</li>
+          <li>Protocol usage & recommendations</li>
+          <li>Portfolio optimization strategies</li>
+        </ul>
+        <p><small>💎 <strong>Note:</strong> You get 1 free AI message. Upgrade to Pro for unlimited chat!</small></p>
       </div>
     </div>
     <div class="chat-input-container">
-      <input type="text" class="chat-input" id="chat-input" placeholder="Ask ChainSage about your wallet..." />
+      <input type="text" class="chat-input" id="chat-input" placeholder="Ask me about your wallet analysis..." />
     </div>
   </div>
 
@@ -1214,6 +1788,15 @@
     let currentChain = 'ethereum';
     let chatHistory = [];
     let recentWallets = JSON.parse(localStorage.getItem('recentWallets') || '[]');
+    let chatUsed = false;
+
+    // Enhanced transaction display variables
+    let allTransactions = [];
+    let filteredTransactions = [];
+    let currentPage = 1;
+    const transactionsPerPage = 10;
+    let protocolCache = new Map();
+    let tokenTransfers = [];
 
     // Theme toggle
     document.getElementById('themeToggle').addEventListener('click', () => {
@@ -1232,6 +1815,453 @@
         displayCharts(currentPersonaData);
       }
     });
+
+    // Smart Chat Functionality - Only appears after analysis
+    function showSmartChatbot() {
+      const chatToggle = document.getElementById('chat-toggle');
+      chatToggle.classList.add('show');
+      
+      // Update welcome message with analysis data
+      const chatMessages = document.getElementById('chat-messages');
+      chatMessages.innerHTML = `
+        <div class="chat-message ai">
+          <p>🚀 <strong>Analysis Complete!</strong> I'm ChainSage, your personal Web3 intelligence companion.</p>
+          
+          <div class="analysis-summary">
+            <strong>📊 Your Wallet Summary:</strong><br>
+            • Activity Level: ${currentPersonaData.activityLevel}%<br>
+            • Security Score: ${currentPersonaData.securityScore}%<br>
+            • Top Archetype: ${Object.entries(currentPersonaData.archetypes).sort((a, b) => b[1] - a[1])[0][0]}<br>
+            • Chain: ${currentChain.toUpperCase()}<br>
+            • Transactions: ${currentPersonaData.transactions?.length || 0}
+          </div>
+          
+          <p>I can answer specific questions about your trading patterns, risk assessment, protocol usage, and optimization strategies!</p>
+          <p><small>💎 <strong>Note:</strong> You get 1 free AI message. Upgrade to Pro for unlimited chat!</small></p>
+        </div>
+      `;
+      
+      // Reset chat usage for new analysis
+      chatUsed = false;
+    }
+
+    document.getElementById('chat-toggle').addEventListener('click', () => {
+      const chatContainer = document.getElementById('chat-container');
+      const chatToggle = document.getElementById('chat-toggle');
+      
+      if (chatContainer.style.display === 'none' || !chatContainer.style.display) {
+        chatContainer.style.display = 'flex';
+        chatContainer.style.height = '600px';
+        chatToggle.style.display = 'none';
+      }
+    });
+
+    document.getElementById('close-chat').addEventListener('click', () => {
+      const chatContainer = document.getElementById('chat-container');
+      const chatToggle = document.getElementById('chat-toggle');
+      
+      chatContainer.style.display = 'none';
+      chatToggle.style.display = 'block';
+    });
+
+    // Minimize/Maximize Chat
+    document.getElementById('minimize-chat').addEventListener('click', () => {
+      const chatContainer = document.getElementById('chat-container');
+      const minimizeBtn = document.getElementById('minimize-chat');
+      const chatMessages = document.getElementById('chat-messages');
+      const chatInput = document.querySelector('.chat-input-container');
+      
+      if (chatContainer.style.height === '60px') {
+        // Maximize
+        chatContainer.style.height = '600px';
+        chatMessages.style.display = 'block';
+        chatInput.style.display = 'block';
+        minimizeBtn.textContent = '−';
+        minimizeBtn.title = 'Minimize Chat';
+      } else {
+        // Minimize
+        chatContainer.style.height = '60px';
+        chatMessages.style.display = 'none';
+        chatInput.style.display = 'none';
+        minimizeBtn.textContent = '+';
+        minimizeBtn.title = 'Maximize Chat';
+      }
+    });
+
+    // Enhanced Chat Input with Analysis Context
+    document.getElementById('chat-input').addEventListener('keypress', async (e) => {
+      if (e.key === 'Enter') {
+        const input = e.target;
+        const question = input.value.trim();
+        if (!question) return;
+
+        addChatMessage(question, 'user');
+        input.value = '';
+
+        if (chatUsed) {
+          addChatMessage('🚀 <strong>Upgrade to ChainPersona Pro</strong> for unlimited AI conversations and advanced insights!', 'ai');
+          addProUpgradeLink();
+          return;
+        }
+
+        try {
+          if (!currentPersonaData) {
+            addChatMessage('Please analyze a wallet first so I can provide personalized insights!', 'ai');
+            return;
+          }
+
+          // Enhanced wallet data with full analysis context
+          const enhancedWalletData = {
+            ...currentPersonaData,
+            chain: currentChain,
+            portfolioValue: document.getElementById('portfolio-value').textContent,
+            transactionPattern: document.getElementById('pattern-description').textContent,
+            dominantArchetype: Object.entries(currentPersonaData.archetypes).sort((a, b) => b[1] - a[1])[0][0],
+            topProtocols: currentPersonaData.topProtocols,
+            behavioralTraits: currentPersonaData.behavioralTraits,
+            aiInsights: currentPersonaData.aiInsights,
+            transactionCount: currentPersonaData.transactions?.length || 0
+          };
+
+          const response = await fetch(`/api/chat/${currentChain}/${currentPersonaData.address}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              question,
+              history: chatHistory,
+              walletData: enhancedWalletData
+            }),
+          });
+
+          if (!response.ok) throw new Error('Chat service unavailable');
+
+          const data = await response.json();
+          
+          addChatMessage(data.response, 'ai');
+          addChatMessage('💎 <strong>Free message used!</strong> Upgrade to ChainPersona Pro for unlimited AI chat and advanced features.', 'ai');
+          addProUpgradeLink();
+          
+          chatUsed = true;
+          chatHistory.push(`User: ${question}`);
+          chatHistory.push(`AI: ${data.response}`);
+        } catch (error) {
+          addChatMessage('I apologize, but I\'m having trouble processing your request right now. Please try asking about your wallet\'s activity patterns, risk assessment, or protocol recommendations!', 'ai');
+        }
+      }
+    });
+
+    function addChatMessage(message, sender) {
+      const messagesContainer = document.getElementById('chat-messages');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `chat-message ${sender}`;
+      messageDiv.innerHTML = `<p>${message}</p>`;
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function addProUpgradeLink() {
+      const messagesContainer = document.getElementById('chat-messages');
+      const linkDiv = document.createElement('div');
+      linkDiv.className = 'chat-suggestion';
+      linkDiv.innerHTML = `
+        <div style="text-align: center; margin: 1rem 0; padding: 1rem; background: linear-gradient(45deg, #ff6b6b, #ff8e53); border-radius: 15px; cursor: pointer;" onclick="scrollToProCard()">
+          <strong style="color: white;">🚀 Get ChainPersona Pro</strong>
+          <br><small style="color: rgba(255,255,255,0.9);">Click to see Pro features</small>
+        </div>
+      `;
+      messagesContainer.appendChild(linkDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function scrollToProCard() {
+      document.getElementById('pro-card').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Enhanced transaction display with protocol identification and token transfers
+    async function enhanceTransactionsWithProtocols(transactions) {
+      // Get unique contract addresses
+      const contractAddresses = [...new Set(
+        transactions
+          .filter(tx => tx.to && tx.to !== '' && tx.to !== tx.from)
+          .map(tx => tx.to.toLowerCase())
+      )];
+      
+      // Analyze contracts that we haven't seen before
+      const newContracts = contractAddresses.filter(addr => !protocolCache.has(addr));
+      
+      if (newContracts.length > 0) {
+        console.log(`🔍 Analyzing ${newContracts.length} new contracts...`);
+        
+        // Call enhanced protocol analyzer
+        try {
+          const response = await fetch('/api/analyze-protocols', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              contracts: newContracts, 
+              chain: currentChain 
+            })
+          });
+          
+          if (response.ok) {
+            const protocolData = await response.json();
+            Object.entries(protocolData).forEach(([addr, info]) => {
+              protocolCache.set(addr, info);
+            });
+            console.log(`✅ Enhanced ${Object.keys(protocolData).length} protocols`);
+          } else {
+            console.log('⚠️ Enhanced protocol analysis not available');
+          }
+        } catch (error) {
+          console.error('Failed to analyze protocols:', error);
+        }
+      }
+      
+      // Enhance transactions with protocol info
+      return transactions.map(tx => ({
+        ...tx,
+        protocolInfo: protocolCache.get(tx.to?.toLowerCase()) || null
+      }));
+    }
+
+    // Display transaction history with enhanced value display
+    async function displayTransactionHistory(transactions) {
+      allTransactions = transactions;
+      
+      // Enhance transactions with protocol info
+      allTransactions = await enhanceTransactionsWithProtocols(transactions);
+      filteredTransactions = allTransactions;
+      
+      // Update transaction count badge
+      document.getElementById('transaction-count-badge').textContent = `${transactions.length} Transactions`;
+      
+      // Calculate and display stats
+      displayTransactionStats(transactions);
+      
+      // Display transactions table
+      displayTransactionsTable();
+      
+      // Setup filters and search
+      setupTransactionFilters();
+    }
+
+    function displayTransactionStats(transactions) {
+      const totalTxns = transactions.length;
+      const totalVolume = transactions.reduce((sum, tx) => {
+        const value = parseFloat(tx.value) / Math.pow(10, 18); // Convert from wei
+        return sum + value;
+      }, 0);
+      
+      const totalGas = transactions.reduce((sum, tx) => sum + parseInt(tx.gasUsed || '0'), 0);
+      const avgGas = totalTxns > 0 ? Math.round(totalGas / totalTxns) : 0;
+      
+      const uniqueContracts = new Set(
+        transactions
+          .filter(tx => tx.contractAddress && tx.contractAddress !== '')
+          .map(tx => tx.contractAddress.toLowerCase())
+      ).size;
+      
+      document.getElementById('total-transactions').textContent = totalTxns.toLocaleString();
+      document.getElementById('total-volume').textContent = `$${(totalVolume * 2000).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      document.getElementById('avg-gas').textContent = avgGas.toLocaleString();
+      document.getElementById('unique-contracts').textContent = uniqueContracts;
+    }
+
+    // Enhanced transaction table display with better value logic
+    function displayTransactionsTable() {
+      const tbody = document.getElementById('transaction-table-body');
+      const startIndex = (currentPage - 1) * transactionsPerPage;
+      const endIndex = startIndex + transactionsPerPage;
+      const pageTransactions = filteredTransactions.slice(startIndex, endIndex);
+      
+      if (pageTransactions.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center">
+              <div class="no-transactions">
+                <i class="fas fa-search fa-2x mb-2"></i>
+                <p>No transactions found</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        document.getElementById('transaction-pagination').classList.add('d-none');
+        return;
+      }
+      
+      tbody.innerHTML = pageTransactions.map(tx => {
+        const age = getTimeAgo(parseInt(tx.timeStamp) * 1000);
+        const value = parseFloat(tx.value) / Math.pow(10, 18);
+        const gasUsed = parseInt(tx.gasUsed || '0');
+        const protocolName = tx.protocolInfo?.name || 'Unknown Protocol';
+        const isError = tx.isError === '1';
+        
+        // Enhanced value display logic
+        let displayValue = '';
+        let valueClass = 'transaction-value';
+        
+        if (value > 0) {
+          // Actual ETH/native token transfer
+          displayValue = `${value.toFixed(4)} ${tx.tokenSymbol}`;
+          valueClass += ' eth-transfer';
+        } else if (tx.category === 'erc20') {
+          // Token transfer - calculate token amount
+          const tokenValue = parseFloat(tx.value) / Math.pow(10, parseInt(tx.tokenDecimal || '18'));
+          displayValue = `${tokenValue.toFixed(4)} ${tx.tokenSymbol}`;
+          valueClass += ' token-transfer';
+        } else if (tx.category === 'internal' && tx.protocolInfo) {
+          // Contract interaction - show as contract call
+          displayValue = `Contract Call`;
+          valueClass += ' contract-call';
+        } else {
+          // Zero value transaction
+          displayValue = `0.0000 ${tx.tokenSymbol}`;
+          valueClass += ' zero-value';
+        }
+        
+        return `
+          <tr class="transaction-row" onclick="openTransaction('${tx.hash}')">
+            <td>
+              <a href="#" class="transaction-hash" onclick="event.preventDefault(); copyToClipboard('${tx.hash}')">
+                ${tx.hash.substring(0, 10)}...
+              </a>
+            </td>
+            <td>
+              <span class="transaction-type ${tx.category}">
+                ${tx.category}
+              </span>
+            </td>
+            <td>
+              <div class="transaction-address">
+                <small>From:</small> ${tx.from.substring(0, 8)}...<br>
+                <small>To:</small> ${tx.to.substring(0, 8)}...
+                ${tx.protocolInfo ? `<br><small class="protocol-name">${protocolName}</small>` : ''}
+              </div>
+            </td>
+            <td class="${valueClass}">
+              ${displayValue}
+            </td>
+            <td class="transaction-gas">
+              ${gasUsed.toLocaleString()}
+            </td>
+            <td class="transaction-age">
+              ${age}
+            </td>
+            <td>
+              <span class="transaction-status ${isError ? 'failed' : 'success'}">
+                ${isError ? 'Failed' : 'Success'}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      
+      updatePagination();
+    }
+
+    function setupTransactionFilters() {
+      const filterSelect = document.getElementById('transaction-filter');
+      const searchInput = document.getElementById('transaction-search');
+      const clearButton = document.getElementById('clear-search');
+      
+      filterSelect.addEventListener('change', filterTransactions);
+      searchInput.addEventListener('input', filterTransactions);
+      clearButton.addEventListener('click', () => {
+        searchInput.value = '';
+        filterTransactions();
+      });
+    }
+
+    function filterTransactions() {
+      const filterType = document.getElementById('transaction-filter').value;
+      const searchTerm = document.getElementById('transaction-search').value.toLowerCase();
+      
+      filteredTransactions = allTransactions.filter(tx => {
+        const matchesFilter = filterType === 'all' || tx.category === filterType;
+        const matchesSearch = searchTerm === '' || 
+          tx.hash.toLowerCase().includes(searchTerm) ||
+          tx.from.toLowerCase().includes(searchTerm) ||
+          tx.to.toLowerCase().includes(searchTerm) ||
+          (tx.protocolInfo?.name && tx.protocolInfo.name.toLowerCase().includes(searchTerm));
+        
+        return matchesFilter && matchesSearch;
+      });
+      
+      currentPage = 1;
+      displayTransactionsTable();
+    }
+
+    function updatePagination() {
+      const totalPages = Math.ceil(filteredTransactions.length / transactionsPerPage);
+      const pagination = document.getElementById('transaction-pagination');
+      
+      if (totalPages <= 1) {
+        pagination.classList.add('d-none');
+        return;
+      }
+      
+      pagination.classList.remove('d-none');
+      
+      const prevButton = document.getElementById('prev-page');
+      const nextButton = document.getElementById('next-page');
+      const currentPageButton = document.getElementById('current-page');
+      
+      currentPageButton.querySelector('a').textContent = `${currentPage} of ${totalPages}`;
+      
+      prevButton.classList.toggle('disabled', currentPage === 1);
+      nextButton.classList.toggle('disabled', currentPage === totalPages);
+      
+      prevButton.onclick = () => {
+        if (currentPage > 1) {
+          currentPage--;
+          displayTransactionsTable();
+        }
+      };
+      
+      nextButton.onclick = () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          displayTransactionsTable();
+        }
+      };
+    }
+
+    function getTimeAgo(timestamp) {
+      const now = Date.now();
+      const diff = now - timestamp;
+      const minutes = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+      
+      if (days > 0) return `${days}d ago`;
+      if (hours > 0) return `${hours}h ago`;
+      if (minutes > 0) return `${minutes}m ago`;
+      return 'Just now';
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        // Show a brief success message
+        const originalText = event.target.textContent;
+        event.target.textContent = 'Copied!';
+        setTimeout(() => {
+          event.target.textContent = originalText;
+        }, 1000);
+      });
+    }
+
+    function openTransaction(hash) {
+      const baseUrls = {
+        ethereum: 'https://etherscan.io/tx/',
+        polygon: 'https://polygonscan.com/tx/',
+        bsc: 'https://bscscan.com/tx/'
+      };
+      
+      const url = baseUrls[currentChain] + hash;
+      window.open(url, '_blank');
+    }
 
     // Wallet suggestions functionality
     document.getElementById('wallet-address').addEventListener('input', (e) => {
@@ -1271,95 +2301,6 @@
       }
     });
 
-    // Chat functionality
-    document.getElementById('chat-toggle').addEventListener('click', () => {
-      const chatContainer = document.getElementById('chat-container');
-      const chatToggle = document.getElementById('chat-toggle');
-      
-      if (chatContainer.style.display === 'none' || !chatContainer.style.display) {
-        chatContainer.style.display = 'flex';
-        chatToggle.style.display = 'none';
-      }
-    });
-
-    document.getElementById('close-chat').addEventListener('click', () => {
-      const chatContainer = document.getElementById('chat-container');
-      const chatToggle = document.getElementById('chat-toggle');
-      
-      chatContainer.style.display = 'none';
-      chatToggle.style.display = 'block';
-    });
-
-    document.getElementById('chat-input').addEventListener('keypress', async (e) => {
-      if (e.key === 'Enter') {
-        const input = e.target;
-        const question = input.value.trim();
-        if (!question) return;
-
-        addChatMessage(question, 'user');
-        input.value = '';
-
-        try {
-          if (!currentPersonaData) {
-            addChatMessage('Please analyze a wallet first so I can provide personalized insights!', 'ai');
-            return;
-          }
-
-          const response = await fetch(`/api/chat/${currentChain}/${currentPersonaData.address}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              question,
-              history: chatHistory,
-              walletData: currentPersonaData
-            }),
-          });
-
-          if (!response.ok) throw new Error('Chat service unavailable');
-
-          const data = await response.json();
-          addChatMessage(data.response, 'ai');
-          
-          if (data.suggestions) {
-            data.suggestions.forEach(suggestion => {
-              addChatSuggestion(suggestion);
-            });
-          }
-
-          chatHistory.push(`User: ${question}`);
-          chatHistory.push(`AI: ${data.response}`);
-        } catch (error) {
-          addChatMessage('I apologize, but I\'m having trouble processing your request right now. Please try asking about your wallet\'s activity patterns, risk assessment, or protocol recommendations!', 'ai');
-        }
-      }
-    });
-
-    function addChatMessage(message, sender) {
-      const messagesContainer = document.getElementById('chat-messages');
-      const messageDiv = document.createElement('div');
-      messageDiv.className = `chat-message ${sender}`;
-      messageDiv.innerHTML = `<p>${message}</p>`;
-      messagesContainer.appendChild(messageDiv);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    function addChatSuggestion(suggestion) {
-      const messagesContainer = document.getElementById('chat-messages');
-      const suggestionDiv = document.createElement('div');
-      suggestionDiv.className = 'chat-suggestion';
-      suggestionDiv.innerHTML = `<small><i class="fas fa-lightbulb"></i> ${suggestion}</small>`;
-      suggestionDiv.style.cssText = 'margin: 0.5rem 0; padding: 0.5rem; background: rgba(255,255,255,0.1); border-radius: 10px; cursor: pointer; font-size: 0.8rem;';
-      
-      suggestionDiv.addEventListener('click', () => {
-        document.getElementById('chat-input').value = suggestion;
-      });
-      
-      messagesContainer.appendChild(suggestionDiv);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
     function saveRecentWallet(address) {
       if (!recentWallets.includes(address)) {
         recentWallets.unshift(address);
@@ -1396,6 +2337,10 @@
       document.getElementById('loading').classList.remove('d-none');
       document.getElementById('results-container').classList.add('d-none');
       
+      // Hide chatbot during analysis
+      document.getElementById('chat-toggle').classList.remove('show');
+      document.getElementById('chat-container').style.display = 'none';
+      
       try {
         const response = await fetch(`/api/persona/${currentChain}/${walletAddress}`);
         if (!response.ok) throw new Error('Failed to analyze wallet');
@@ -1405,12 +2350,12 @@
         document.getElementById('loading').classList.add('d-none');
         document.getElementById('results-container').classList.remove('d-none');
         
+        // Show smart chatbot after successful analysis
+        setTimeout(() => {
+          showSmartChatbot();
+        }, 1000);
+        
         chatHistory = [];
-        document.getElementById('chat-messages').innerHTML = `
-          <div class="chat-message ai">
-            <p>🚀 <strong>Analysis Complete!</strong> I've decoded your wallet's blockchain DNA! Ask me about your trading patterns, risk profile, or discover hidden opportunities in your portfolio.</p>
-          </div>
-        `;
       } catch (error) {
         alert('Failed to analyze wallet. Please try again.');
         document.getElementById('loading').classList.add('d-none');
@@ -1418,7 +2363,6 @@
     });
 
     function calculatePortfolioValue(persona) {
-      // Simulate portfolio value calculation
       const baseValue = Math.random() * 50000 + 1000;
       return baseValue.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
     }
@@ -1438,7 +2382,6 @@
     function displayEnhancedPersona(persona) {
       document.getElementById('wallet-address-display').innerHTML = `<i class='fas fa-wallet'></i> ${persona.address.substring(0, 6)}...${persona.address.substring(38)}`;
       
-      // Portfolio value and pattern
       document.getElementById('portfolio-value').textContent = calculatePortfolioValue(persona);
       document.getElementById('pattern-description').textContent = identifyTransactionPattern(persona);
       
@@ -1449,21 +2392,23 @@
       document.getElementById('risk-score').style.width = `${persona.riskScore}%`;
       document.getElementById('risk-score-value').textContent = `${persona.riskScore}%`;
       
-      // AI Insights with better fallbacks
+      // AI Insights
       if (persona.aiInsights) {
-        document.getElementById('trading-style').textContent = persona.aiInsights.tradingStyle || 'Conservative approach with steady patterns';
-        document.getElementById('risk-tolerance').textContent = persona.aiInsights.riskTolerance || 'Moderate risk tolerance based on activity';
-        document.getElementById('defi-sophistication').textContent = persona.aiInsights.defiSophistication || 'Intermediate DeFi user with growing expertise';
+        document.getElementById('trading-style').textContent = persona.aiInsights.tradingBehavior || 'Strategic approach with calculated patterns';
+        document.getElementById('risk-tolerance').textContent = persona.aiInsights.riskFactors?.join(', ') || 'Moderate risk with careful consideration';
+        document.getElementById('defi-sophistication').textContent = persona.aiInsights.overallAssessment || 'Active DeFi participant with growing expertise';
         
-        const aiBehavioralContainer = document.getElementById('ai-behavioral-traits');
-        aiBehavioralContainer.innerHTML = '<h6><i class="fas fa-robot"></i> AI Behavioral Analysis</h6>';
-        const traits = persona.aiInsights.behavioralTraits || ['Data-driven', 'Strategic', 'Risk-aware'];
-        traits.forEach(trait => {
-          const traitDiv = document.createElement('div');
-          traitDiv.className = 'trait-pill';
-          traitDiv.textContent = trait;
-          aiBehavioralContainer.appendChild(traitDiv);
-        });
+        // Show AI insights in separate card
+        const aiInsightsContainer = document.getElementById('ai-general-insights');
+        if (aiInsightsContainer) {
+          aiInsightsContainer.innerHTML = `
+            <h6><i class="fas fa-robot"></i> AI General Assessment</h6>
+            <p><strong>Overall:</strong> ${persona.aiInsights.overallAssessment}</p>
+            <p><strong>Key Strengths:</strong> ${persona.aiInsights.keyStrengths?.join(', ')}</p>
+            <p><strong>Risk Factors:</strong> ${persona.aiInsights.riskFactors?.join(', ')}</p>
+            <p><strong>Recommendation:</strong> ${persona.aiInsights.recommendation}</p>
+          `;
+        }
       }
       
       // Archetypes
@@ -1476,15 +2421,17 @@
         archetypesContainer.appendChild(archetypeEl);
       });
       
-      // Top Protocols with better names
+      // Top Protocols
       const topProtocolsList = document.getElementById('top-protocols');
       topProtocolsList.innerHTML = '';
-      const protocols = persona.topProtocols.length > 0 ? persona.topProtocols : ['Uniswap V2 (15 txns)', 'OpenSea (8 txns)', 'Compound (5 txns)'];
+      const protocols = persona.topProtocols.length > 0 ? persona.topProtocols : ['Loading AI analysis...'];
       protocols.forEach(protocol => {
-        const protocolItem = document.createElement('li');
-        protocolItem.className = 'protocol-item';
-        protocolItem.textContent = protocol;
-        topProtocolsList.appendChild(protocolItem);
+        if (protocol) {
+          const protocolItem = document.createElement('li');
+          protocolItem.className = 'protocol-item';
+          protocolItem.innerHTML = `<i class="fas fa-cube"></i> ${protocol}`;
+          topProtocolsList.appendChild(protocolItem);
+        }
       });
       
       // Basic Traits
@@ -1509,84 +2456,12 @@
         recommendationsList.appendChild(recItem);
       });
       
-      // AI Recommendations
-      const aiRecommendationsList = document.getElementById('ai-recommendations');
-      aiRecommendationsList.innerHTML = '';
-      const aiRecs = (persona.aiInsights && persona.aiInsights.recommendations) ? 
-        persona.aiInsights.recommendations : 
-        ['Diversify into yield farming', 'Consider governance participation', 'Explore Layer 2 solutions', 'Implement DCA strategy'];
-      aiRecs.forEach(rec => {
-        const recItem = document.createElement('li');
-        recItem.className = 'recommendation-item';
-        recItem.innerHTML = `<i class="fas fa-robot"></i> ${rec}`;
-        aiRecommendationsList.appendChild(recItem);
-      });
-      
-      // Security Analysis with better defaults
-      if (persona.securityAnalysis) {
-        displaySecurityAnalysis(persona.securityAnalysis);
-      } else {
-        displaySecurityAnalysis({
-          threatLevel: 'Low',
-          securityScore: persona.securityScore,
-          threats: [],
-          recommendations: ['Enable transaction monitoring', 'Regular security audits', 'Use hardware wallet for large amounts']
-        });
-      }
-      
-      if (persona.portfolioOptimization) {
-        displayPortfolioOptimization(persona.portfolioOptimization);
+      // Display transaction history if available
+      if (persona.transactions && persona.transactions.length > 0) {
+        displayTransactionHistory(persona.transactions);
       }
       
       displayCharts(persona);
-    }
-
-    function displaySecurityAnalysis(securityAnalysis) {
-      const container = document.getElementById('security-analysis-container');
-      container.innerHTML = '';
-      
-      const threatLevel = securityAnalysis.threatLevel || 'Medium';
-      const securityScore = securityAnalysis.securityScore || 75;
-      
-      const alertDiv = document.createElement('div');
-      alertDiv.className = `security-alert ${threatLevel.toLowerCase()}`;
-      alertDiv.innerHTML = `
-        <h6><i class="fas fa-shield-alt"></i> Threat Level: ${threatLevel}</h6>
-        <p><strong>Security Score:</strong> ${securityScore}/100</p>
-      `;
-      
-      if (securityAnalysis.threats && securityAnalysis.threats.length > 0) {
-        alertDiv.innerHTML += '<p><strong>Threats:</strong></p><ul>';
-        securityAnalysis.threats.forEach(threat => {
-          alertDiv.innerHTML += `<li>${threat}</li>`;
-        });
-        alertDiv.innerHTML += '</ul>';
-      }
-      
-      if (securityAnalysis.recommendations && securityAnalysis.recommendations.length > 0) {
-        alertDiv.innerHTML += '<p><strong>Recommendations:</strong></p><ul>';
-        securityAnalysis.recommendations.forEach(rec => {
-          alertDiv.innerHTML += `<li>${rec}</li>`;
-        });
-        alertDiv.innerHTML += '</ul>';
-      }
-      
-      container.appendChild(alertDiv);
-    }
-
-    function displayPortfolioOptimization(optimization) {
-      const container = document.getElementById('portfolio-optimization');
-      container.innerHTML = '<h6><i class="fas fa-chart-line"></i> AI Portfolio Optimization</h6>';
-      
-      if (optimization && typeof optimization === 'object' && !optimization.error) {
-        const optimizationDiv = document.createElement('div');
-                optimizationDiv.className = 'ai-insights';
-        optimizationDiv.innerHTML = `
-          <p><strong>AI Analysis:</strong> ${JSON.stringify(optimization).substring(0, 200)}...</p>
-          <small>Full optimization report available in chat interface</small>
-        `;
-        container.appendChild(optimizationDiv);
-      }
     }
 
     function displayCharts(persona) {
@@ -1701,9 +2576,16 @@
       const archetypes = Object.entries(persona.archetypes).filter(([_, value]) => value > 0).sort((a, b) => b[1] - a[1]).slice(0, 5);
       const labels = archetypes.map(([name, _]) => name);
       const data = archetypes.map(([_, value]) => value);
-      const colors = isDarkTheme ? 
-        ['rgba(0, 255, 242, 0.8)', 'rgba(78, 84, 200, 0.8)', 'rgba(143, 148, 251, 0.8)', 'rgba(255, 107, 107, 0.8)', 'rgba(255, 142, 83, 0.8)'] :
-        ['rgba(78, 84, 200, 0.7)', 'rgba(138, 35, 135, 0.7)', 'rgba(75, 108, 183, 0.7)', 'rgba(244, 107, 69, 0.7)', 'rgba(17, 153, 142, 0.7)'];
+      
+      const colors = [
+        'rgba(78, 84, 200, 0.8)',
+        'rgba(255, 107, 107, 0.8)',
+        'rgba(0, 255, 242, 0.8)',
+        'rgba(255, 193, 7, 0.8)',
+        'rgba(138, 43, 226, 0.8)',
+        'rgba(255, 99, 132, 0.8)',
+        'rgba(54, 162, 235, 0.8)'
+      ];
       
       const ctx = document.getElementById('categoryDistribution').getContext('2d');
       new Chart(ctx, {
@@ -1713,12 +2595,15 @@
           datasets: [{
             data: data,
             backgroundColor: colors,
-            borderWidth: 2,
-            borderColor: isDarkTheme ? 'rgba(255, 255, 255, 0.2)' : 'rgba(44, 62, 80, 0.1)'
+            borderWidth: 3,
+            borderColor: isDarkTheme ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.8)',
+            hoverBorderWidth: 4,
+            hoverBorderColor: '#ffffff'
           }]
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           plugins: {
             title: {
               display: true,
@@ -1726,7 +2611,8 @@
               color: textColor,
               font: {
                 family: "'Rajdhani', sans-serif",
-                size: 16
+                size: 16,
+                weight: 'bold'
               }
             },
             legend: {
@@ -1734,124 +2620,159 @@
               labels: {
                 color: textColor,
                 font: {
-                  family: "'Rajdhani', sans-serif"
+                  family: "'Rajdhani', sans-serif",
+                  size: 12
+                },
+                padding: 15,
+                usePointStyle: true,
+                pointStyle: 'circle'
+              }
+            },
+            tooltip: {
+              backgroundColor: isDarkTheme ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+              titleColor: textColor,
+              bodyColor: textColor,
+              borderColor: isDarkTheme ? '#00fff2' : '#4e54c8',
+              borderWidth: 1,
+              callbacks: {
+                label: function(context) {
+                  return context.label + ': ' + context.parsed + '%';
                 }
               }
             }
+          },
+          cutout: '60%',
+          animation: {
+            animateRotate: true,
+            animateScale: true,
+            duration: 1000
           }
         }
       });
     }
 
+    // Enhanced PDF Export Function
     function exportAsPDF() {
       if (!currentPersonaData) return;
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+      const doc = new jsPDF('p', 'mm', 'a4');
       
-      doc.setFontSize(20);
-      doc.setTextColor(40, 40, 40);
-      doc.text("ChainPersona AI Wallet Analysis", 20, 20);
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 20;
+      const contentWidth = pageWidth - (margin * 2);
       
-      doc.setFontSize(12);
-      doc.text(`Address: ${currentPersonaData.address}`, 20, 35);
-      doc.text(`Chain: ${currentChain.toUpperCase()}`, 20, 45);
-      doc.text(`Portfolio Value: ${document.getElementById('portfolio-value').textContent}`, 20, 55);
-      doc.text(`Activity Level: ${currentPersonaData.activityLevel}%`, 20, 65);
-      doc.text(`Security Score: ${currentPersonaData.securityScore}%`, 20, 75);
-      doc.text(`Risk Score: ${currentPersonaData.riskScore}%`, 20, 85);
-      
-      doc.setFontSize(14);
-      doc.text("Transaction Pattern:", 20, 100);
-      doc.setFontSize(10);
-      doc.text(document.getElementById('pattern-description').textContent, 25, 110);
-      
-      let y = 125;
-      doc.setFontSize(14);
-      doc.text("Persona Archetypes:", 20, y);
-      y += 10;
-      doc.setFontSize(10);
-      Object.entries(currentPersonaData.archetypes).forEach(([key, value]) => {
-        doc.text(`${key}: ${value}%`, 25, y);
-        y += 8;
-      });
-      
-      y += 10;
-      doc.setFontSize(14);
-      doc.text("Top Protocols:", 20, y);
-      y += 10;
-      doc.setFontSize(10);
-      currentPersonaData.topProtocols.forEach(protocol => {
-        doc.text(`• ${protocol}`, 25, y);
-        y += 6;
-      });
-      
-      y += 10;
-      doc.setFontSize(14);
-      doc.text("Behavioral Traits:", 20, y);
-      y += 10;
-      doc.setFontSize(10);
-      currentPersonaData.behavioralTraits.forEach(trait => {
-        doc.text(`• ${trait}`, 25, y);
-        y += 6;
-      });
-      
-      y += 10;
-      doc.setFontSize(14);
-      doc.text("Standard Recommendations:", 20, y);
-      y += 10;
-      doc.setFontSize(10);
-      currentPersonaData.recommendedDapps.forEach(dapp => {
-        doc.text(`• ${dapp}`, 25, y);
-        y += 6;
-      });
-      
-      y += 10;
-      doc.setFontSize(14);
-      doc.text("AI Recommendations:", 20, y);
-      y += 10;
-      doc.setFontSize(10);
-      if (currentPersonaData.aiInsights && currentPersonaData.aiInsights.recommendations) {
-        currentPersonaData.aiInsights.recommendations.forEach(rec => {
-          doc.text(`• ${rec}`, 25, y);
-          y += 6;
+      function addWatermark() {
+        doc.setGState(new doc.GState({opacity: 0.1}));
+        doc.setFontSize(60);
+        doc.setTextColor(200, 200, 200);
+        doc.text('ChainPersona', pageWidth/2, pageHeight/2, {
+          angle: 45,
+          align: 'center'
         });
+        doc.setGState(new doc.GState({opacity: 1}));
       }
       
-      if (currentPersonaData.aiInsights) {
-        y += 10;
-        doc.setFontSize(14);
-        doc.text("AI Insights:", 20, y);
-        y += 10;
+      function addHeader() {
+        doc.setFillColor(78, 84, 200);
+        doc.rect(0, 0, pageWidth, 15, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text('ChainPersona AI', margin, 10);
+        
         doc.setFontSize(10);
-        doc.text(`Trading Style: ${currentPersonaData.aiInsights.tradingStyle}`, 25, y);
-        y += 6;
-        doc.text(`Risk Tolerance: ${currentPersonaData.aiInsights.riskTolerance}`, 25, y);
-        y += 6;
-        doc.text(`DeFi Sophistication: ${currentPersonaData.aiInsights.defiSophistication}`, 25, y);
-        y += 6;
+        doc.setFont('helvetica', 'normal');
+        doc.text('Web3 Wallet Intelligence Engine', pageWidth - margin, 10, { align: 'right' });
       }
       
-      if (currentPersonaData.securityAnalysis && y < 250) {
-        y += 10;
-        doc.setFontSize(14);
-        doc.text("Security Analysis:", 20, y);
-        y += 10;
-        doc.setFontSize(10);
-        doc.text(`Threat Level: ${currentPersonaData.securityAnalysis.threatLevel}`, 25, y);
-        y += 6;
-        doc.text(`Security Score: ${currentPersonaData.securityAnalysis.securityScore}`, 25, y);
-        y += 6;
+      function addFooter(pageNum) {
+        doc.setTextColor(128, 128, 128);
+        doc.setFontSize(8);
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, margin, pageHeight - 10);
+        doc.text(`Page ${pageNum}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
+        doc.text('chainpersona.ai', pageWidth/2, pageHeight - 10, { align: 'center' });
       }
       
-      doc.setFontSize(8);
-      doc.setTextColor(128, 128, 128);
-      doc.text("Generated by ChainPersona AI - Web3 Wallet Intelligence Engine", 20, 280);
-      doc.text(`Report generated on: ${new Date().toLocaleString()}`, 20, 285);
+      addWatermark();
+      addHeader();
+      
+      let yPos = 25;
+      
+      doc.setTextColor(44, 62, 80);
+      doc.setFontSize(24);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Wallet Analysis Report', margin, yPos);
+      yPos += 15;
+      
+      doc.setFillColor(240, 248, 255);
+      doc.setDrawColor(78, 84, 200);
+      doc.rect(margin, yPos, contentWidth, 25, 'FD');
+      
+      yPos += 8;
+      doc.setTextColor(78, 84, 200);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Wallet Address:', margin + 5, yPos);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(currentPersonaData.address, margin + 35, yPos);
+      
+      yPos += 6;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Blockchain:', margin + 5, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.text(currentChain.toUpperCase(), margin + 25, yPos);
+      
+      yPos += 6;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Portfolio Value:', margin + 5, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.text(document.getElementById('portfolio-value').textContent, margin + 32, yPos);
+      
+      yPos += 6;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Transactions:', margin + 5, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`${currentPersonaData.transactions?.length || 0} transactions`, margin + 25, yPos);
+      
+      yPos += 15;
+      
+      doc.setTextColor(44, 62, 80);
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Key Metrics', margin, yPos);
+      yPos += 10;
+      
+      const metricsData = [
+        ['Activity Level', `${currentPersonaData.activityLevel}%`],
+        ['Security Score', `${currentPersonaData.securityScore}%`],
+        ['Risk Score', `${currentPersonaData.riskScore}%`],
+        ['Transaction Pattern', document.getElementById('pattern-description').textContent]
+      ];
+      
+      metricsData.forEach(([label, value]) => {
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(78, 84, 200);
+        doc.text(label + ':', margin, yPos);
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(44, 62, 80);
+        doc.text(value, margin + 40, yPos);
+        yPos += 7;
+      });
+      
+      addFooter(1);
       
       doc.save(`chainpersona_ai_${currentPersonaData.address.substring(0, 6)}.pdf`);
     }
 
     document.getElementById('export-pdf').addEventListener('click', exportAsPDF);
+
+    console.log('🚀 ChainPersona AI with Enhanced Transaction History and Value Display loaded successfully!');
   </script>
 </body>
 </html>
