@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ChainPersona - Web3 Wallet Persona Engine</title>
+  <title>ChainPersona AI - Web3 Wallet Intelligence Engine</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -22,6 +22,7 @@
       --bg-bright: #f5f7fa;
       --card-bg-bright: rgba(255, 255, 255, 0.9);
       --text-bright: #2c3e50;
+      --ai-glow: #ff6b6b;
     }
 
     * {
@@ -126,21 +127,23 @@
       background: var(--secondary-glow);
     }
 
-    .chart-container {
-      position: relative;
-      height: 250px;
-      margin-bottom: 1.5rem;
+    .ai-badge {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: linear-gradient(45deg, var(--ai-glow), #ff8e53);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      animation: aiPulse 2s infinite;
     }
 
-    .no-chart-message {
-      text-align: center;
-      font-style: italic;
-      color: var(--accent-glow);
-      margin: 1rem 0;
-    }
-
-    body.bright-theme .no-chart-message {
-      color: #3498db;
+    @keyframes aiPulse {
+      0%, 100% { box-shadow: 0 0 5px var(--ai-glow); }
+      50% { box-shadow: 0 0 20px var(--ai-glow), 0 0 30px var(--ai-glow); }
     }
 
     .app-header {
@@ -166,6 +169,13 @@
     .app-title .persona {
       color: var(--sky-blue);
       text-shadow: 0 0 15px rgba(135, 206, 235, 0.8);
+    }
+
+    .app-title .ai {
+      color: var(--ai-glow);
+      text-shadow: 0 0 15px var(--ai-glow);
+      font-size: 0.7em;
+      vertical-align: super;
     }
 
     body.bright-theme .app-title .chain {
@@ -207,6 +217,125 @@
     .card-title i {
       color: var(--accent-glow);
       margin-right: 10px;
+    }
+
+    .ai-insights {
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 142, 83, 0.1));
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .ai-insights h6 {
+      color: var(--ai-glow);
+      font-family: 'Orbitron', sans-serif;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .ai-insights h6 i {
+      margin-right: 8px;
+      animation: aiPulse 2s infinite;
+    }
+
+    .chat-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 350px;
+      height: 500px;
+      background: var(--card-bg-dark);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(15px);
+      display: none;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    body.bright-theme .chat-container {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: rgba(0, 0, 0, 0.1);
+      color: #2c3e50;
+    }
+
+    .chat-header {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      max-height: 350px;
+    }
+
+    .chat-input-container {
+      padding: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .chat-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 10px 15px;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    body.bright-theme .chat-input {
+      background: rgba(0, 0, 0, 0.05);
+      border-color: rgba(0, 0, 0, 0.2);
+      color: #2c3e50;
+    }
+
+    .chat-message {
+      margin-bottom: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 15px;
+      max-width: 80%;
+    }
+
+    .chat-message.user {
+      background: var(--primary-glow);
+      color: white;
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .chat-message.ai {
+      background: rgba(255, 107, 107, 0.2);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+    }
+
+    .chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(45deg, var(--ai-glow), #ff8e53);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+      transition: all 0.3s ease;
+      z-index: 1001;
+    }
+
+    .chat-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(255, 107, 107, 0.6);
     }
 
     .chain-selector {
@@ -718,14 +847,47 @@
         transform: translateY(0);
       }
     }
+
+    .portfolio-optimization {
+      margin-top: 1rem;
+    }
+
+    .security-alert {
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 142, 83, 0.1));
+      border: 1px solid rgba(255, 107, 107, 0.4);
+      border-radius: 10px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .security-alert.high {
+      border-color: #ff6b6b;
+      background: rgba(255, 107, 107, 0.3);
+    }
+
+    .security-alert.medium {
+      border-color: #ffa726;
+      background: rgba(255, 167, 38, 0.2);
+    }
+
+    .security-alert.low {
+      border-color: #66bb6a;
+      background: rgba(102, 187, 106, 0.2);
+    }
   </style>
 </head>
 <body class="dark-theme">
+  <div class="ai-badge">
+    <i class="fas fa-robot"></i> AI Powered
+  </div>
   <button class="theme-toggle" id="themeToggle">Switch to Bright Theme</button>
+  
   <div class="container">
     <div class="app-header">
-      <h1 class="app-title"><span class="chain">Chain</span><span class="persona">Persona</span></h1>
-      <p class="app-subtitle">Unlock the story behind any Web3 wallet</p>
+      <h1 class="app-title">
+        <span class="chain">Chain</span><span class="persona">Persona</span><span class="ai">AI</span>
+      </h1>
+      <p class="app-subtitle">AI-Powered Web3 Wallet Intelligence Engine</p>
     </div>
 
     <div class="row justify-content-center mb-5">
@@ -734,7 +896,7 @@
           <div class="card-body">
             <h5 class="card-title">
               <i class="fas fa-search"></i>
-              Analyze Wallet
+              Analyze Wallet with AI
             </h5>
             <div class="chain-selector mb-4">
               <h6 class="mb-2">Select Blockchain:</h6>
@@ -762,7 +924,7 @@
             <div class="input-group">
               <input type="text" id="wallet-address" class="form-control" placeholder="Enter wallet address (0x...)" />
               <button class="btn btn-analyze" id="analyze-btn">
-                <i class="fas fa-bolt"></i> ANALYZE
+                <i class="fas fa-robot"></i> AI ANALYZE
               </button>
             </div>
             <div id="loading" class="loading-container d-none">
@@ -770,7 +932,7 @@
               <div class="loading-progress">
                 <div class="loading-progress-bar"></div>
               </div>
-              <p class="loading-text">Analyzing on-chain data...</p>
+              <p class="loading-text">AI analyzing on-chain data...</p>
             </div>
           </div>
         </div>
@@ -802,7 +964,7 @@
               <i class="fas fa-user-circle"></i>
               Wallet Profile
             </h5>
-            <span class="hex-badge" id="wallet-type-badge">Power User</span>
+            <span class="hex-badge" id="wallet-type-badge">AI Analyzed</span>
           </div>
           <div class="card-body">
             <div class="text-center mb-4">
@@ -834,8 +996,18 @@
                 <div id="risk-score" class="progress-bar progress-risk" role="progressbar" style="width: 0%"></div>
               </div>
             </div>
+            
+            <div class="ai-insights" id="ai-insights-container">
+              <h6><i class="fas fa-robot"></i> AI Insights</h6>
+              <div id="ai-insights-content">
+                <p><strong>Trading Style:</strong> <span id="trading-style">-</span></p>
+                <p><strong>Risk Tolerance:</strong> <span id="risk-tolerance">-</span></p>
+                <p><strong>DeFi Sophistication:</strong> <span id="defi-sophistication">-</span></p>
+              </div>
+            </div>
           </div>
         </div>
+        
         <div class="card persona-card fade-in" style="animation-delay: 0.2s;">
           <div class="card-header">
             <h5>
@@ -863,15 +1035,18 @@
             </div>
           </div>
         </div>
+        
         <div class="card persona-card fade-in" style="animation-delay: 0.3s;">
           <div class="card-header">
             <h5>
               <i class="fas fa-brain"></i>
-              Behavioral Traits
+              AI Behavioral Analysis
             </h5>
           </div>
           <div class="card-body">
             <div class="traits-container" id="traits-container">
+            </div>
+            <div id="ai-behavioral-traits" class="mt-3">
             </div>
           </div>
         </div>
@@ -882,15 +1057,25 @@
           <div class="card-header">
             <h5>
               <i class="fas fa-lightbulb"></i>
-              Recommendations
+              AI Recommendations
             </h5>
           </div>
           <div class="card-body p-0">
-            <div class="recommendation-intro p-3 pb-0">
-              <p class="text-muted mb-2">Based on your wallet's persona, we recommend:</p>
-            </div>
             <ul class="recommendation-list" id="recommendations">
             </ul>
+          </div>
+        </div>
+        
+        <div class="card persona-card fade-in" style="animation-delay: 0.4s;">
+          <div class="card-header">
+            <h5>
+              <i class="fas fa-shield-alt"></i>
+              Security Analysis
+            </h5>
+          </div>
+          <div class="card-body">
+            <div id="security-analysis-container">
+            </div>
           </div>
         </div>
       </div>
@@ -900,11 +1085,13 @@
           <div class="card-header">
             <h5>
               <i class="fas fa-chart-line"></i>
-              Wallet Analytics
+              Wallet Analytics & Portfolio Optimization
             </h5>
           </div>
           <div class="card-body">
             <div id="charts-container">
+            </div>
+            <div id="portfolio-optimization" class="portfolio-optimization">
             </div>
           </div>
         </div>
@@ -912,9 +1099,31 @@
     </div>
   </div>
 
+  <button class="chat-toggle" id="chat-toggle">
+    <i class="fas fa-comments"></i>
+  </button>
+
+  <div class="chat-container" id="chat-container">
+    <div class="chat-header">
+      <h6><i class="fas fa-robot"></i> Chat with AI</h6>
+      <button class="btn btn-sm" id="close-chat">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-message ai">
+        <p>Hello! I'm your AI assistant. Ask me anything about your wallet analysis!</p>
+      </div>
+    </div>
+    <div class="chat-input-container">
+      <input type="text" class="chat-input" id="chat-input" placeholder="Ask about your wallet..." />
+    </div>
+  </div>
+
   <script>
     let currentPersonaData = null;
     let currentChain = 'ethereum';
+    let chatHistory = [];
 
     document.getElementById('themeToggle').addEventListener('click', () => {
       const body = document.body;
@@ -932,6 +1141,86 @@
         displayCharts(currentPersonaData);
       }
     });
+
+    document.getElementById('chat-toggle').addEventListener('click', () => {
+      const chatContainer = document.getElementById('chat-container');
+      const chatToggle = document.getElementById('chat-toggle');
+      
+      if (chatContainer.style.display === 'none' || !chatContainer.style.display) {
+        chatContainer.style.display = 'flex';
+        chatToggle.style.display = 'none';
+      }
+    });
+
+    document.getElementById('close-chat').addEventListener('click', () => {
+      const chatContainer = document.getElementById('chat-container');
+      const chatToggle = document.getElementById('chat-toggle');
+      
+      chatContainer.style.display = 'none';
+      chatToggle.style.display = 'block';
+    });
+
+    document.getElementById('chat-input').addEventListener('keypress', async (e) => {
+      if (e.key === 'Enter') {
+        const input = e.target;
+        const question = input.value.trim();
+        if (!question) return;
+
+        addChatMessage(question, 'user');
+        input.value = '';
+
+        try {
+          const response = await fetch(`/api/chat/${currentChain}/${currentPersonaData?.address}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              question,
+              history: chatHistory
+            }),
+          });
+
+          const data = await response.json();
+          addChatMessage(data.response, 'ai');
+          
+          if (data.suggestions) {
+            data.suggestions.forEach(suggestion => {
+              addChatSuggestion(suggestion);
+            });
+          }
+
+          chatHistory.push(`User: ${question}`);
+          chatHistory.push(`AI: ${data.response}`);
+        } catch (error) {
+          addChatMessage('Sorry, I encountered an error. Please try again.', 'ai');
+        }
+      }
+    });
+
+    function addChatMessage(message, sender) {
+      const messagesContainer = document.getElementById('chat-messages');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `chat-message ${sender}`;
+      messageDiv.innerHTML = `<p>${message}</p>`;
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function addChatSuggestion(suggestion) {
+      const messagesContainer = document.getElementById('chat-messages');
+      const suggestionDiv = document.createElement('div');
+      suggestionDiv.className = 'chat-suggestion';
+      suggestionDiv.innerHTML = `<small><i class="fas fa-lightbulb"></i> ${suggestion}</small>`;
+      suggestionDiv.style.cssText = 'margin: 0.5rem 0; padding: 0.5rem; background: rgba(255,255,255,0.1); border-radius: 10px; cursor: pointer; font-size: 0.8rem;';
+      
+      suggestionDiv.addEventListener('click', () => {
+        document.getElementById('chat-input').value = suggestion;
+      });
+      
+      messagesContainer.appendChild(suggestionDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
 
     function setupChainSelector() {
       const chainOptions = document.querySelectorAll('.chain-option');
@@ -954,23 +1243,32 @@
         alert('Please enter a valid wallet address');
         return;
       }
+      
       document.getElementById('loading').classList.remove('d-none');
       document.getElementById('results-container').classList.add('d-none');
+      
       try {
         const response = await fetch(`/api/persona/${currentChain}/${walletAddress}`);
         if (!response.ok) throw new Error('Failed to analyze wallet');
         const persona = await response.json();
         currentPersonaData = persona;
-        displayPersona(persona);
+        displayEnhancedPersona(persona);
         document.getElementById('loading').classList.add('d-none');
         document.getElementById('results-container').classList.remove('d-none');
+        
+        chatHistory = [];
+        document.getElementById('chat-messages').innerHTML = `
+          <div class="chat-message ai">
+            <p>Hello! I've analyzed your wallet. Ask me anything about your portfolio, risks, or recommendations!</p>
+          </div>
+        `;
       } catch (error) {
         alert('Failed to analyze wallet. Please try again.');
         document.getElementById('loading').classList.add('d-none');
       }
     });
 
-    function displayPersona(persona) {
+    function displayEnhancedPersona(persona) {
       document.getElementById('wallet-address-display').innerHTML = `<i class='fas fa-wallet'></i> ${persona.address.substring(0, 6)}...${persona.address.substring(38)}`;
       document.getElementById('activity-level').style.width = `${persona.activityLevel}%`;
       document.getElementById('activity-level-value').textContent = `${persona.activityLevel}%`;
@@ -978,6 +1276,21 @@
       document.getElementById('security-score-value').textContent = `${persona.securityScore}%`;
       document.getElementById('risk-score').style.width = `${persona.riskScore}%`;
       document.getElementById('risk-score-value').textContent = `${persona.riskScore}%`;
+      
+      if (persona.aiInsights) {
+        document.getElementById('trading-style').textContent = persona.aiInsights.tradingStyle;
+        document.getElementById('risk-tolerance').textContent = persona.aiInsights.riskTolerance;
+        document.getElementById('defi-sophistication').textContent = persona.aiInsights.defiSophistication;
+        
+        const aiBehavioralContainer = document.getElementById('ai-behavioral-traits');
+        aiBehavioralContainer.innerHTML = '<h6><i class="fas fa-robot"></i> AI Behavioral Analysis</h6>';
+        persona.aiInsights.behavioralTraits.forEach(trait => {
+          const traitDiv = document.createElement('div');
+          traitDiv.className = 'trait-pill';
+          traitDiv.textContent = trait;
+          aiBehavioralContainer.appendChild(traitDiv);
+        });
+      }
       
       const archetypesContainer = document.getElementById('archetypes-container');
       archetypesContainer.innerHTML = '';
@@ -1008,14 +1321,78 @@
       
       const recommendationsList = document.getElementById('recommendations');
       recommendationsList.innerHTML = '';
-      persona.recommendedDapps.forEach(dapp => {
-        const recItem = document.createElement('li');
-        recItem.className = 'recommendation-item';
-        recItem.textContent = dapp;
-        recommendationsList.appendChild(recItem);
-      });
+      if (persona.aiInsights && persona.aiInsights.recommendations) {
+        persona.aiInsights.recommendations.forEach(rec => {
+          const recItem = document.createElement('li');
+          recItem.className = 'recommendation-item';
+          recItem.innerHTML = `<i class="fas fa-robot"></i> ${rec}`;
+          recommendationsList.appendChild(recItem);
+        });
+      } else {
+        persona.recommendedDapps.forEach(dapp => {
+          const recItem = document.createElement('li');
+          recItem.className = 'recommendation-item';
+          recItem.textContent = dapp;
+          recommendationsList.appendChild(recItem);
+        });
+      }
+      
+      if (persona.securityAnalysis) {
+        displaySecurityAnalysis(persona.securityAnalysis);
+      }
+      
+      if (persona.portfolioOptimization) {
+        displayPortfolioOptimization(persona.portfolioOptimization);
+      }
       
       displayCharts(persona);
+    }
+
+    function displaySecurityAnalysis(securityAnalysis) {
+      const container = document.getElementById('security-analysis-container');
+      container.innerHTML = '';
+      
+      if (securityAnalysis.threatLevel) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `security-alert ${securityAnalysis.threatLevel.toLowerCase()}`;
+        alertDiv.innerHTML = `
+          <h6><i class="fas fa-shield-alt"></i> Threat Level: ${securityAnalysis.threatLevel}</h6>
+          <p><strong>Security Score:</strong> ${securityAnalysis.securityScore}/100</p>
+        `;
+        
+        if (securityAnalysis.threats && securityAnalysis.threats.length > 0) {
+          alertDiv.innerHTML += '<p><strong>Threats:</strong></p><ul>';
+          securityAnalysis.threats.forEach(threat => {
+            alertDiv.innerHTML += `<li>${threat}</li>`;
+          });
+          alertDiv.innerHTML += '</ul>';
+        }
+        
+        if (securityAnalysis.recommendations && securityAnalysis.recommendations.length > 0) {
+          alertDiv.innerHTML += '<p><strong>Recommendations:</strong></p><ul>';
+          securityAnalysis.recommendations.forEach(rec => {
+            alertDiv.innerHTML += `<li>${rec}</li>`;
+          });
+          alertDiv.innerHTML += '</ul>';
+        }
+        
+        container.appendChild(alertDiv);
+      }
+    }
+
+    function displayPortfolioOptimization(optimization) {
+      const container = document.getElementById('portfolio-optimization');
+      container.innerHTML = '<h6><i class="fas fa-chart-line"></i> AI Portfolio Optimization</h6>';
+      
+      if (optimization && typeof optimization === 'object' && !optimization.error) {
+        const optimizationDiv = document.createElement('div');
+        optimizationDiv.className = 'ai-insights';
+        optimizationDiv.innerHTML = `
+          <p><strong>AI Analysis:</strong> ${JSON.stringify(optimization).substring(0, 200)}...</p>
+          <small>Full optimization report available in chat interface</small>
+        `;
+        container.appendChild(optimizationDiv);
+      }
     }
 
     function displayCharts(persona) {
@@ -1042,14 +1419,6 @@
           canvas2.height = 250;
           canvas2Container.appendChild(canvas2);
           chartRow.appendChild(canvas2Container);
-        } else {
-          const msgContainer = document.createElement('div');
-          msgContainer.className = 'col-lg-6';
-          const msg = document.createElement('p');
-          msg.className = 'no-chart-message';
-          msg.textContent = 'Archetype distribution chart not relevant for this wallet.';
-          msgContainer.appendChild(msg);
-          chartRow.appendChild(msgContainer);
         }
         
         chartsContainer.appendChild(chartRow);
@@ -1228,7 +1597,7 @@
       
       doc.setFontSize(20);
       doc.setTextColor(40, 40, 40);
-      doc.text("ChainPersona Wallet Analysis", 20, 20);
+      doc.text("ChainPersona AI Wallet Analysis", 20, 20);
       
       doc.setFontSize(12);
       doc.text(`Address: ${currentPersonaData.address}`, 20, 35);
@@ -1268,20 +1637,41 @@
       
       y += 10;
       doc.setFontSize(14);
-      doc.text("Recommended DApps:", 20, y);
+      doc.text("AI Recommendations:", 20, y);
       y += 10;
       doc.setFontSize(10);
-      currentPersonaData.recommendedDapps.forEach(dapp => {
-        doc.text(`• ${dapp}`, 25, y);
+      if (currentPersonaData.aiInsights && currentPersonaData.aiInsights.recommendations) {
+        currentPersonaData.aiInsights.recommendations.forEach(rec => {
+          doc.text(`• ${rec}`, 25, y);
+          y += 8;
+        });
+      } else {
+        currentPersonaData.recommendedDapps.forEach(dapp => {
+          doc.text(`• ${dapp}`, 25, y);
+          y += 8;
+        });
+      }
+      
+      y += 10;
+      if (currentPersonaData.aiInsights) {
+        doc.setFontSize(14);
+        doc.text("AI Insights:", 20, y);
+        y += 10;
+        doc.setFontSize(10);
+        doc.text(`Trading Style: ${currentPersonaData.aiInsights.tradingStyle}`, 25, y);
         y += 8;
-      });
+        doc.text(`Risk Tolerance: ${currentPersonaData.aiInsights.riskTolerance}`, 25, y);
+        y += 8;
+        doc.text(`DeFi Sophistication: ${currentPersonaData.aiInsights.defiSophistication}`, 25, y);
+        y += 8;
+      }
       
       doc.setFontSize(8);
       doc.setTextColor(128, 128, 128);
-      doc.text("Generated by ChainPersona - Web3 Wallet Analysis Tool", 20, 280);
+      doc.text("Generated by ChainPersona AI - Web3 Wallet Intelligence Engine", 20, 280);
       doc.text(`Report generated on: ${new Date().toLocaleString()}`, 20, 285);
       
-      doc.save(`chainpersona_${currentPersonaData.address.substring(0, 6)}.pdf`);
+      doc.save(`chainpersona_ai_${currentPersonaData.address.substring(0, 6)}.pdf`);
     }
 
     document.getElementById('export-csv').addEventListener('click', exportAsCSV);
