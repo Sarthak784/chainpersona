@@ -172,11 +172,15 @@ export class EnhancedPersonaEngine {
         let protocol = chainProtocols[addr];
         
         if (!protocol) {
-          const aiAnalysis = await this.aiService.analyzeProtocol(addr, undefined, {
-            interactionCount: interactionCounts[addr],
-            chain: this.chainType
-          });
-          protocol = { name: aiAnalysis.name, category: aiAnalysis.category };
+          try {
+            const aiAnalysis = await this.aiService.analyzeProtocol(addr, undefined, {
+              interactionCount: interactionCounts[addr],
+              chain: this.chainType
+            });
+            protocol = { name: aiAnalysis.name, category: aiAnalysis.category };
+          } catch (error: any) {
+            protocol = { name: `Contract ${addr.substring(0, 8)}...`, category: 'unknown' };
+          }
         }
         
         return `${protocol.name} (${interactionCounts[addr]} txns)`;
@@ -207,8 +211,6 @@ export class EnhancedPersonaEngine {
     return `${recent.length} transactions across ${uniqueProtocols} protocols`;
   }
 
-  // ... (include all other methods from the original PersonaEngine)
-  
   private normalizeArchetypes(archetypes: Record<PersonaArchetype, number>): Record<PersonaArchetype, number> {
     const total = Object.values(archetypes).reduce((sum, score) => sum + score, 0);
     
@@ -324,15 +326,19 @@ export class EnhancedPersonaEngine {
     const chainProtocols = this.protocols[this.chainType] || {};
     const categoryCounts: Record<string, number> = {};
     
-    for (const tx of contractInteractions.slice(0, 10)) { // Limit AI calls
+    for (const tx of contractInteractions.slice(0, 10)) {
       const address = tx.to?.toLowerCase();
       if (!address) continue;
       
       let protocol = chainProtocols[address];
       
       if (!protocol) {
-        const aiAnalysis = await this.aiService.analyzeProtocol(address);
-        protocol = { name: aiAnalysis.name, category: aiAnalysis.category };
+        try {
+          const aiAnalysis = await this.aiService.analyzeProtocol(address);
+          protocol = { name: aiAnalysis.name, category: aiAnalysis.category };
+        } catch (error: any) {
+          protocol = { name: `Contract ${address.substring(0, 8)}...`, category: 'unknown' };
+        }
       }
       
       if (protocol && protocol.category !== 'unknown') {
@@ -401,7 +407,7 @@ export class EnhancedPersonaEngine {
     const recommendations: string[] = [];
     
     const dominantArchetype = Object.entries(persona.archetypes)
-      .sort((a, b) => b[1] - a[1])[0][0] as PersonaArchetype;
+      .sort((a, b) => (b[1] as number) - (a[1] as number))[0][0] as PersonaArchetype;
     
     switch (dominantArchetype) {
       case PersonaArchetype.DEFI_USER:

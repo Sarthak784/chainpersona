@@ -4,6 +4,7 @@ export declare class MultiChainDataCollector implements IDataCollector {
     private apiKeys;
     private chainType;
     constructor(chainType: string | undefined, providerUrl: string, apiKeys?: Record<string, string>);
+    getChainType(): string;
     getWalletTransactions(address: string, limit?: number): Promise<any[]>;
     private getEthereumTransactions;
     private getPolygonTransactions;
@@ -13,6 +14,5 @@ export declare class MultiChainDataCollector implements IDataCollector {
     private getPolygonTokenBalances;
     private getBscTokenBalances;
     getContractInteractions(address: string, limit?: number): Promise<any[]>;
-    getChainType(): string;
 }
 //# sourceMappingURL=multiChainDataCollector.d.ts.map

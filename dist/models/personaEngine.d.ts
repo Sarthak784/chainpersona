@@ -20,9 +20,11 @@ export interface WalletPersona {
 }
 export declare class PersonaEngine {
     private dataCollector;
+    private chainType;
     private protocols;
     constructor(dataCollector: IDataCollector);
     generatePersona(address: string): Promise<WalletPersona>;
+    private normalizeArchetypes;
     private initializeArchetypes;
     private calculateActivityLevel;
     private identifyTopProtocols;

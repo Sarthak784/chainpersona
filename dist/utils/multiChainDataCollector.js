@@ -12,6 +12,9 @@ class MultiChainDataCollector {
         this.apiKeys = apiKeys;
         this.provider = new ethers_1.ethers.providers.JsonRpcProvider(providerUrl);
     }
+    getChainType() {
+        return this.chainType;
+    }
     async getWalletTransactions(address, limit = 100) {
         try {
             if (this.chainType === 'ethereum') {
@@ -169,9 +172,6 @@ class MultiChainDataCollector {
             console.error(`Error fetching ${this.chainType} contract interactions:`, error);
             return [];
         }
-    }
-    getChainType() {
-        return this.chainType;
     }
 }
 exports.MultiChainDataCollector = MultiChainDataCollector;

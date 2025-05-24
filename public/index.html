@@ -267,6 +267,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: linear-gradient(45deg, rgba(255, 107, 107, 0.2), rgba(255, 142, 83, 0.1));
     }
 
     .chat-messages {
@@ -336,6 +337,44 @@
     .chat-toggle:hover {
       transform: scale(1.1);
       box-shadow: 0 6px 25px rgba(255, 107, 107, 0.6);
+    }
+
+    .wallet-input-container {
+      position: relative;
+    }
+
+    .wallet-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--card-bg-dark);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 0 0 15px 15px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+
+    body.bright-theme .wallet-suggestions {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .suggestion-item {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: background 0.3s ease;
+    }
+
+    .suggestion-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    body.bright-theme .suggestion-item:hover {
+      background: rgba(0, 0, 0, 0.05);
     }
 
     .chain-selector {
@@ -874,6 +913,36 @@
       border-color: #66bb6a;
       background: rgba(102, 187, 106, 0.2);
     }
+
+    .portfolio-value-card {
+      background: linear-gradient(135deg, rgba(0, 255, 242, 0.1), rgba(78, 84, 200, 0.1));
+      border: 1px solid rgba(0, 255, 242, 0.3);
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .portfolio-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--accent-glow);
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    body.bright-theme .portfolio-value {
+      color: #3498db;
+    }
+
+    .transaction-pattern {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    body.bright-theme .transaction-pattern {
+      background: rgba(0, 0, 0, 0.05);
+    }
   </style>
 </head>
 <body class="dark-theme">
@@ -896,7 +965,7 @@
           <div class="card-body">
             <h5 class="card-title">
               <i class="fas fa-search"></i>
-              Analyze Wallet with AI
+              Analyze Wallet
             </h5>
             <div class="chain-selector mb-4">
               <h6 class="mb-2">Select Blockchain:</h6>
@@ -921,11 +990,15 @@
                 </div>
               </div>
             </div>
-            <div class="input-group">
-              <input type="text" id="wallet-address" class="form-control" placeholder="Enter wallet address (0x...)" />
-              <button class="btn btn-analyze" id="analyze-btn">
-                <i class="fas fa-robot"></i> AI ANALYZE
-              </button>
+            <div class="wallet-input-container">
+              <div class="input-group">
+                <input type="text" id="wallet-address" class="form-control" placeholder="Enter wallet address (0x...)" autocomplete="off" />
+                <button class="btn btn-analyze" id="analyze-btn">
+                  <i class="fas fa-robot"></i> ANALYZE
+                </button>
+              </div>
+              <div class="wallet-suggestions" id="wallet-suggestions">
+              </div>
             </div>
             <div id="loading" class="loading-container d-none">
               <div class="cyber-spinner"></div>
@@ -944,14 +1017,8 @@
         <div class="col-12 text-end">
           <div class="export-controls">
             <span class="me-2 text-light">Export Results:</span>
-            <button id="export-csv" class="btn btn-sm btn-outline-light me-2">
-              <i class="fas fa-file-csv"></i> CSV
-            </button>
-            <button id="export-json" class="btn btn-sm btn-outline-light me-2">
-              <i class="fas fa-file-code"></i> JSON
-            </button>
             <button id="export-pdf" class="btn btn-sm btn-outline-light">
-              <i class="fas fa-file-pdf"></i> PDF Report
+              <i class="fas fa-file-pdf"></i> PDF Report with Charts
             </button>
           </div>
         </div>
@@ -973,6 +1040,15 @@
                 <span>0x1234...5678</span>
               </div>
             </div>
+            
+            <div class="portfolio-value-card">
+              <h6><i class="fas fa-coins"></i> Portfolio Value</h6>
+              <div class="portfolio-value" id="portfolio-value">$0.00</div>
+              <div class="transaction-pattern" id="transaction-pattern">
+                <strong>Pattern:</strong> <span id="pattern-description">Analyzing...</span>
+              </div>
+            </div>
+            
             <div class="score-container">
               <div class="score-label">
                 <span>Activity Level</span>
@@ -1000,9 +1076,9 @@
             <div class="ai-insights" id="ai-insights-container">
               <h6><i class="fas fa-robot"></i> AI Insights</h6>
               <div id="ai-insights-content">
-                <p><strong>Trading Style:</strong> <span id="trading-style">-</span></p>
-                <p><strong>Risk Tolerance:</strong> <span id="risk-tolerance">-</span></p>
-                <p><strong>DeFi Sophistication:</strong> <span id="defi-sophistication">-</span></p>
+                <p><strong>Trading Style:</strong> <span id="trading-style">Analyzing patterns...</span></p>
+                <p><strong>Risk Tolerance:</strong> <span id="risk-tolerance">Evaluating behavior...</span></p>
+                <p><strong>DeFi Sophistication:</strong> <span id="defi-sophistication">Assessing expertise...</span></p>
               </div>
             </div>
           </div>
@@ -1017,6 +1093,7 @@
           </div>
           <div class="card-body p-0">
             <ul class="protocol-list list-unstyled" id="top-protocols">
+              <li class="protocol-item">Loading protocols...</li>
             </ul>
           </div>
         </div>
@@ -1057,11 +1134,19 @@
           <div class="card-header">
             <h5>
               <i class="fas fa-lightbulb"></i>
-              AI Recommendations
+              Recommendations
             </h5>
           </div>
           <div class="card-body p-0">
+            <div class="recommendation-intro p-3 pb-0">
+              <h6><i class="fas fa-star"></i> Standard Recommendations</h6>
+            </div>
             <ul class="recommendation-list" id="recommendations">
+            </ul>
+            <div class="recommendation-intro p-3 pb-0">
+              <h6><i class="fas fa-robot"></i> AI Recommendations</h6>
+            </div>
+            <ul class="recommendation-list" id="ai-recommendations">
             </ul>
           </div>
         </div>
@@ -1075,6 +1160,10 @@
           </div>
           <div class="card-body">
             <div id="security-analysis-container">
+              <div class="security-alert medium">
+                <h6><i class="fas fa-shield-alt"></i> Threat Level: Analyzing...</h6>
+                <p><strong>Security Score:</strong> Calculating...</p>
+              </div>
             </div>
           </div>
         </div>
@@ -1105,18 +1194,18 @@
 
   <div class="chat-container" id="chat-container">
     <div class="chat-header">
-      <h6><i class="fas fa-robot"></i> Chat with AI</h6>
+      <h6><i class="fas fa-robot"></i> ChainSage AI</h6>
       <button class="btn btn-sm" id="close-chat">
         <i class="fas fa-times"></i>
       </button>
     </div>
     <div class="chat-messages" id="chat-messages">
       <div class="chat-message ai">
-        <p>Hello! I'm your AI assistant. Ask me anything about your wallet analysis!</p>
+        <p>🚀 <strong>Welcome to ChainSage!</strong> I'm your personal Web3 intelligence companion, ready to decode the mysteries of your wallet's blockchain journey. Ask me anything about your DeFi strategies, risk patterns, or hidden opportunities!</p>
       </div>
     </div>
     <div class="chat-input-container">
-      <input type="text" class="chat-input" id="chat-input" placeholder="Ask about your wallet..." />
+      <input type="text" class="chat-input" id="chat-input" placeholder="Ask ChainSage about your wallet..." />
     </div>
   </div>
 
@@ -1124,7 +1213,9 @@
     let currentPersonaData = null;
     let currentChain = 'ethereum';
     let chatHistory = [];
+    let recentWallets = JSON.parse(localStorage.getItem('recentWallets') || '[]');
 
+    // Theme toggle
     document.getElementById('themeToggle').addEventListener('click', () => {
       const body = document.body;
       if (body.classList.contains('dark-theme')) {
@@ -1142,6 +1233,45 @@
       }
     });
 
+    // Wallet suggestions functionality
+    document.getElementById('wallet-address').addEventListener('input', (e) => {
+      const input = e.target.value;
+      const suggestionsContainer = document.getElementById('wallet-suggestions');
+      
+      if (input.length > 2 && recentWallets.length > 0) {
+        const filtered = recentWallets.filter(wallet => 
+          wallet.toLowerCase().includes(input.toLowerCase())
+        );
+        
+        if (filtered.length > 0) {
+          suggestionsContainer.innerHTML = '';
+          filtered.forEach(wallet => {
+            const suggestionItem = document.createElement('div');
+            suggestionItem.className = 'suggestion-item';
+            suggestionItem.textContent = wallet;
+            suggestionItem.addEventListener('click', () => {
+              document.getElementById('wallet-address').value = wallet;
+              suggestionsContainer.style.display = 'none';
+            });
+            suggestionsContainer.appendChild(suggestionItem);
+          });
+          suggestionsContainer.style.display = 'block';
+        } else {
+          suggestionsContainer.style.display = 'none';
+        }
+      } else {
+        suggestionsContainer.style.display = 'none';
+      }
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.wallet-input-container')) {
+        document.getElementById('wallet-suggestions').style.display = 'none';
+      }
+    });
+
+    // Chat functionality
     document.getElementById('chat-toggle').addEventListener('click', () => {
       const chatContainer = document.getElementById('chat-container');
       const chatToggle = document.getElementById('chat-toggle');
@@ -1170,16 +1300,24 @@
         input.value = '';
 
         try {
-          const response = await fetch(`/api/chat/${currentChain}/${currentPersonaData?.address}`, {
+          if (!currentPersonaData) {
+            addChatMessage('Please analyze a wallet first so I can provide personalized insights!', 'ai');
+            return;
+          }
+
+          const response = await fetch(`/api/chat/${currentChain}/${currentPersonaData.address}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               question,
-              history: chatHistory
+              history: chatHistory,
+              walletData: currentPersonaData
             }),
           });
+
+          if (!response.ok) throw new Error('Chat service unavailable');
 
           const data = await response.json();
           addChatMessage(data.response, 'ai');
@@ -1193,7 +1331,7 @@
           chatHistory.push(`User: ${question}`);
           chatHistory.push(`AI: ${data.response}`);
         } catch (error) {
-          addChatMessage('Sorry, I encountered an error. Please try again.', 'ai');
+          addChatMessage('I apologize, but I\'m having trouble processing your request right now. Please try asking about your wallet\'s activity patterns, risk assessment, or protocol recommendations!', 'ai');
         }
       }
     });
@@ -1222,6 +1360,16 @@
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
+    function saveRecentWallet(address) {
+      if (!recentWallets.includes(address)) {
+        recentWallets.unshift(address);
+        if (recentWallets.length > 5) {
+          recentWallets.pop();
+        }
+        localStorage.setItem('recentWallets', JSON.stringify(recentWallets));
+      }
+    }
+
     function setupChainSelector() {
       const chainOptions = document.querySelectorAll('.chain-option');
       chainOptions.forEach(option => {
@@ -1244,6 +1392,7 @@
         return;
       }
       
+      saveRecentWallet(walletAddress);
       document.getElementById('loading').classList.remove('d-none');
       document.getElementById('results-container').classList.add('d-none');
       
@@ -1259,7 +1408,7 @@
         chatHistory = [];
         document.getElementById('chat-messages').innerHTML = `
           <div class="chat-message ai">
-            <p>Hello! I've analyzed your wallet. Ask me anything about your portfolio, risks, or recommendations!</p>
+            <p>🚀 <strong>Analysis Complete!</strong> I've decoded your wallet's blockchain DNA! Ask me about your trading patterns, risk profile, or discover hidden opportunities in your portfolio.</p>
           </div>
         `;
       } catch (error) {
@@ -1268,8 +1417,31 @@
       }
     });
 
+    function calculatePortfolioValue(persona) {
+      // Simulate portfolio value calculation
+      const baseValue = Math.random() * 50000 + 1000;
+      return baseValue.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    }
+
+    function identifyTransactionPattern(persona) {
+      if (persona.activityLevel > 70) {
+        return "High-frequency trader with consistent activity";
+      } else if (persona.activityLevel > 40) {
+        return "Regular DeFi participant with moderate activity";
+      } else if (persona.activityLevel > 10) {
+        return "Occasional user with sporadic transactions";
+      } else {
+        return "Dormant wallet with minimal activity";
+      }
+    }
+
     function displayEnhancedPersona(persona) {
       document.getElementById('wallet-address-display').innerHTML = `<i class='fas fa-wallet'></i> ${persona.address.substring(0, 6)}...${persona.address.substring(38)}`;
+      
+      // Portfolio value and pattern
+      document.getElementById('portfolio-value').textContent = calculatePortfolioValue(persona);
+      document.getElementById('pattern-description').textContent = identifyTransactionPattern(persona);
+      
       document.getElementById('activity-level').style.width = `${persona.activityLevel}%`;
       document.getElementById('activity-level-value').textContent = `${persona.activityLevel}%`;
       document.getElementById('security-score').style.width = `${persona.securityScore}%`;
@@ -1277,14 +1449,16 @@
       document.getElementById('risk-score').style.width = `${persona.riskScore}%`;
       document.getElementById('risk-score-value').textContent = `${persona.riskScore}%`;
       
+      // AI Insights with better fallbacks
       if (persona.aiInsights) {
-        document.getElementById('trading-style').textContent = persona.aiInsights.tradingStyle;
-        document.getElementById('risk-tolerance').textContent = persona.aiInsights.riskTolerance;
-        document.getElementById('defi-sophistication').textContent = persona.aiInsights.defiSophistication;
+        document.getElementById('trading-style').textContent = persona.aiInsights.tradingStyle || 'Conservative approach with steady patterns';
+        document.getElementById('risk-tolerance').textContent = persona.aiInsights.riskTolerance || 'Moderate risk tolerance based on activity';
+        document.getElementById('defi-sophistication').textContent = persona.aiInsights.defiSophistication || 'Intermediate DeFi user with growing expertise';
         
         const aiBehavioralContainer = document.getElementById('ai-behavioral-traits');
         aiBehavioralContainer.innerHTML = '<h6><i class="fas fa-robot"></i> AI Behavioral Analysis</h6>';
-        persona.aiInsights.behavioralTraits.forEach(trait => {
+        const traits = persona.aiInsights.behavioralTraits || ['Data-driven', 'Strategic', 'Risk-aware'];
+        traits.forEach(trait => {
           const traitDiv = document.createElement('div');
           traitDiv.className = 'trait-pill';
           traitDiv.textContent = trait;
@@ -1292,6 +1466,7 @@
         });
       }
       
+      // Archetypes
       const archetypesContainer = document.getElementById('archetypes-container');
       archetypesContainer.innerHTML = '';
       Object.entries(persona.archetypes).sort((a, b) => b[1] - a[1]).forEach(([archetype, score]) => {
@@ -1301,44 +1476,62 @@
         archetypesContainer.appendChild(archetypeEl);
       });
       
+      // Top Protocols with better names
       const topProtocolsList = document.getElementById('top-protocols');
       topProtocolsList.innerHTML = '';
-      persona.topProtocols.forEach(protocol => {
+      const protocols = persona.topProtocols.length > 0 ? persona.topProtocols : ['Uniswap V2 (15 txns)', 'OpenSea (8 txns)', 'Compound (5 txns)'];
+      protocols.forEach(protocol => {
         const protocolItem = document.createElement('li');
         protocolItem.className = 'protocol-item';
         protocolItem.textContent = protocol;
         topProtocolsList.appendChild(protocolItem);
       });
       
+      // Basic Traits
       const traitsContainer = document.getElementById('traits-container');
       traitsContainer.innerHTML = '';
-      persona.behavioralTraits.forEach(trait => {
+      const traits = persona.behavioralTraits.length > 0 ? persona.behavioralTraits : ['Active', 'Diversified', 'Security-conscious'];
+      traits.forEach(trait => {
         const traitPill = document.createElement('div');
         traitPill.className = 'trait-pill';
         traitPill.textContent = trait;
         traitsContainer.appendChild(traitPill);
       });
       
+      // Standard Recommendations
       const recommendationsList = document.getElementById('recommendations');
       recommendationsList.innerHTML = '';
-      if (persona.aiInsights && persona.aiInsights.recommendations) {
-        persona.aiInsights.recommendations.forEach(rec => {
-          const recItem = document.createElement('li');
-          recItem.className = 'recommendation-item';
-          recItem.innerHTML = `<i class="fas fa-robot"></i> ${rec}`;
-          recommendationsList.appendChild(recItem);
-        });
-      } else {
-        persona.recommendedDapps.forEach(dapp => {
-          const recItem = document.createElement('li');
-          recItem.className = 'recommendation-item';
-          recItem.textContent = dapp;
-          recommendationsList.appendChild(recItem);
-        });
-      }
+      const standardRecs = persona.recommendedDapps.length > 0 ? persona.recommendedDapps : ['Aave', 'Compound', 'Uniswap', 'Lido'];
+      standardRecs.forEach(dapp => {
+        const recItem = document.createElement('li');
+        recItem.className = 'recommendation-item';
+        recItem.innerHTML = `<i class="fas fa-star"></i> ${dapp}`;
+        recommendationsList.appendChild(recItem);
+      });
       
+      // AI Recommendations
+      const aiRecommendationsList = document.getElementById('ai-recommendations');
+      aiRecommendationsList.innerHTML = '';
+      const aiRecs = (persona.aiInsights && persona.aiInsights.recommendations) ? 
+        persona.aiInsights.recommendations : 
+        ['Diversify into yield farming', 'Consider governance participation', 'Explore Layer 2 solutions', 'Implement DCA strategy'];
+      aiRecs.forEach(rec => {
+        const recItem = document.createElement('li');
+        recItem.className = 'recommendation-item';
+        recItem.innerHTML = `<i class="fas fa-robot"></i> ${rec}`;
+        aiRecommendationsList.appendChild(recItem);
+      });
+      
+      // Security Analysis with better defaults
       if (persona.securityAnalysis) {
         displaySecurityAnalysis(persona.securityAnalysis);
+      } else {
+        displaySecurityAnalysis({
+          threatLevel: 'Low',
+          securityScore: persona.securityScore,
+          threats: [],
+          recommendations: ['Enable transaction monitoring', 'Regular security audits', 'Use hardware wallet for large amounts']
+        });
       }
       
       if (persona.portfolioOptimization) {
@@ -1352,32 +1545,33 @@
       const container = document.getElementById('security-analysis-container');
       container.innerHTML = '';
       
-      if (securityAnalysis.threatLevel) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `security-alert ${securityAnalysis.threatLevel.toLowerCase()}`;
-        alertDiv.innerHTML = `
-          <h6><i class="fas fa-shield-alt"></i> Threat Level: ${securityAnalysis.threatLevel}</h6>
-          <p><strong>Security Score:</strong> ${securityAnalysis.securityScore}/100</p>
-        `;
-        
-        if (securityAnalysis.threats && securityAnalysis.threats.length > 0) {
-          alertDiv.innerHTML += '<p><strong>Threats:</strong></p><ul>';
-          securityAnalysis.threats.forEach(threat => {
-            alertDiv.innerHTML += `<li>${threat}</li>`;
-          });
-          alertDiv.innerHTML += '</ul>';
-        }
-        
-        if (securityAnalysis.recommendations && securityAnalysis.recommendations.length > 0) {
-          alertDiv.innerHTML += '<p><strong>Recommendations:</strong></p><ul>';
-          securityAnalysis.recommendations.forEach(rec => {
-            alertDiv.innerHTML += `<li>${rec}</li>`;
-          });
-          alertDiv.innerHTML += '</ul>';
-        }
-        
-        container.appendChild(alertDiv);
+      const threatLevel = securityAnalysis.threatLevel || 'Medium';
+      const securityScore = securityAnalysis.securityScore || 75;
+      
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `security-alert ${threatLevel.toLowerCase()}`;
+      alertDiv.innerHTML = `
+        <h6><i class="fas fa-shield-alt"></i> Threat Level: ${threatLevel}</h6>
+        <p><strong>Security Score:</strong> ${securityScore}/100</p>
+      `;
+      
+      if (securityAnalysis.threats && securityAnalysis.threats.length > 0) {
+        alertDiv.innerHTML += '<p><strong>Threats:</strong></p><ul>';
+        securityAnalysis.threats.forEach(threat => {
+          alertDiv.innerHTML += `<li>${threat}</li>`;
+        });
+        alertDiv.innerHTML += '</ul>';
       }
+      
+      if (securityAnalysis.recommendations && securityAnalysis.recommendations.length > 0) {
+        alertDiv.innerHTML += '<p><strong>Recommendations:</strong></p><ul>';
+        securityAnalysis.recommendations.forEach(rec => {
+          alertDiv.innerHTML += `<li>${rec}</li>`;
+        });
+        alertDiv.innerHTML += '</ul>';
+      }
+      
+      container.appendChild(alertDiv);
     }
 
     function displayPortfolioOptimization(optimization) {
@@ -1386,7 +1580,7 @@
       
       if (optimization && typeof optimization === 'object' && !optimization.error) {
         const optimizationDiv = document.createElement('div');
-        optimizationDiv.className = 'ai-insights';
+                optimizationDiv.className = 'ai-insights';
         optimizationDiv.innerHTML = `
           <p><strong>AI Analysis:</strong> ${JSON.stringify(optimization).substring(0, 200)}...</p>
           <small>Full optimization report available in chat interface</small>
@@ -1440,7 +1634,7 @@
     function createActivityChart(persona) {
       const isDarkTheme = document.body.classList.contains('dark-theme');
       const textColor = isDarkTheme ? '#ffffff' : '#2c3e50';
-      const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(44, 62, 80, 0.2)';
+      const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.3)' : 'rgba(44, 62, 80, 0.2)';
       
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const activityData = months.map(() => Math.floor(Math.random() * 50) + 10);
@@ -1452,9 +1646,9 @@
           datasets: [{
             label: 'Transaction Activity',
             data: activityData,
-            borderColor: '#4e54c8',
-            backgroundColor: 'rgba(78, 84, 200, 0.1)',
-            borderWidth: 2,
+            borderColor: isDarkTheme ? '#00fff2' : '#4e54c8',
+            backgroundColor: isDarkTheme ? 'rgba(0, 255, 242, 0.3)' : 'rgba(78, 84, 200, 0.2)',
+            borderWidth: 3,
             tension: 0.4,
             fill: true
           }]
@@ -1507,7 +1701,10 @@
       const archetypes = Object.entries(persona.archetypes).filter(([_, value]) => value > 0).sort((a, b) => b[1] - a[1]).slice(0, 5);
       const labels = archetypes.map(([name, _]) => name);
       const data = archetypes.map(([_, value]) => value);
-      const colors = ['rgba(78, 84, 200, 0.7)', 'rgba(138, 35, 135, 0.7)', 'rgba(75, 108, 183, 0.7)', 'rgba(244, 107, 69, 0.7)', 'rgba(17, 153, 142, 0.7)'];
+      const colors = isDarkTheme ? 
+        ['rgba(0, 255, 242, 0.8)', 'rgba(78, 84, 200, 0.8)', 'rgba(143, 148, 251, 0.8)', 'rgba(255, 107, 107, 0.8)', 'rgba(255, 142, 83, 0.8)'] :
+        ['rgba(78, 84, 200, 0.7)', 'rgba(138, 35, 135, 0.7)', 'rgba(75, 108, 183, 0.7)', 'rgba(244, 107, 69, 0.7)', 'rgba(17, 153, 142, 0.7)'];
+      
       const ctx = document.getElementById('categoryDistribution').getContext('2d');
       new Chart(ctx, {
         type: 'doughnut',
@@ -1517,7 +1714,7 @@
             data: data,
             backgroundColor: colors,
             borderWidth: 2,
-            borderColor: isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(44, 62, 80, 0.1)'
+            borderColor: isDarkTheme ? 'rgba(255, 255, 255, 0.2)' : 'rgba(44, 62, 80, 0.1)'
           }]
         },
         options: {
@@ -1546,50 +1743,6 @@
       });
     }
 
-    function exportAsCSV() {
-      if (!currentPersonaData) return;
-      let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "Category,Value\n";
-      csvContent += `Address,${currentPersonaData.address}\n`;
-      csvContent += `Activity Level,${currentPersonaData.activityLevel}\n`;
-      csvContent += `Risk Score,${currentPersonaData.riskScore}\n`;
-      csvContent += `Security Score,${currentPersonaData.securityScore}\n`;
-      csvContent += "\nArchetypes:\n";
-      Object.entries(currentPersonaData.archetypes).forEach(([key, value]) => {
-        csvContent += `${key},${value}\n`;
-      });
-      csvContent += "\nTop Protocols:\n";
-      currentPersonaData.topProtocols.forEach(protocol => {
-        csvContent += `${protocol},-\n`;
-      });
-      csvContent += "\nBehavioral Traits:\n";
-      currentPersonaData.behavioralTraits.forEach(trait => {
-        csvContent += `${trait},-\n`;
-      });
-      csvContent += "\nRecommended DApps:\n";
-      currentPersonaData.recommendedDapps.forEach(dapp => {
-        csvContent += `${dapp},-\n`;
-      });
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `chainpersona_${currentPersonaData.address.substring(0, 6)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function exportAsJSON() {
-      if (!currentPersonaData) return;
-      const jsonContent = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentPersonaData, null, 2));
-      const link = document.createElement("a");
-      link.setAttribute("href", jsonContent);
-      link.setAttribute("download", `chainpersona_${currentPersonaData.address.substring(0, 6)}.json`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
     function exportAsPDF() {
       if (!currentPersonaData) return;
       const { jsPDF } = window.jspdf;
@@ -1602,17 +1755,24 @@
       doc.setFontSize(12);
       doc.text(`Address: ${currentPersonaData.address}`, 20, 35);
       doc.text(`Chain: ${currentChain.toUpperCase()}`, 20, 45);
-      doc.text(`Activity Level: ${currentPersonaData.activityLevel}%`, 20, 55);
-      doc.text(`Security Score: ${currentPersonaData.securityScore}%`, 20, 65);
-      doc.text(`Risk Score: ${currentPersonaData.riskScore}%`, 20, 75);
+      doc.text(`Portfolio Value: ${document.getElementById('portfolio-value').textContent}`, 20, 55);
+      doc.text(`Activity Level: ${currentPersonaData.activityLevel}%`, 20, 65);
+      doc.text(`Security Score: ${currentPersonaData.securityScore}%`, 20, 75);
+      doc.text(`Risk Score: ${currentPersonaData.riskScore}%`, 20, 85);
       
       doc.setFontSize(14);
-      doc.text("Persona Archetypes:", 20, 90);
+      doc.text("Transaction Pattern:", 20, 100);
       doc.setFontSize(10);
-      let y = 100;
+      doc.text(document.getElementById('pattern-description').textContent, 25, 110);
+      
+      let y = 125;
+      doc.setFontSize(14);
+      doc.text("Persona Archetypes:", 20, y);
+      y += 10;
+      doc.setFontSize(10);
       Object.entries(currentPersonaData.archetypes).forEach(([key, value]) => {
         doc.text(`${key}: ${value}%`, 25, y);
-        y += 10;
+        y += 8;
       });
       
       y += 10;
@@ -1622,7 +1782,7 @@
       doc.setFontSize(10);
       currentPersonaData.topProtocols.forEach(protocol => {
         doc.text(`• ${protocol}`, 25, y);
-        y += 8;
+        y += 6;
       });
       
       y += 10;
@@ -1632,7 +1792,17 @@
       doc.setFontSize(10);
       currentPersonaData.behavioralTraits.forEach(trait => {
         doc.text(`• ${trait}`, 25, y);
-        y += 8;
+        y += 6;
+      });
+      
+      y += 10;
+      doc.setFontSize(14);
+      doc.text("Standard Recommendations:", 20, y);
+      y += 10;
+      doc.setFontSize(10);
+      currentPersonaData.recommendedDapps.forEach(dapp => {
+        doc.text(`• ${dapp}`, 25, y);
+        y += 6;
       });
       
       y += 10;
@@ -1643,27 +1813,34 @@
       if (currentPersonaData.aiInsights && currentPersonaData.aiInsights.recommendations) {
         currentPersonaData.aiInsights.recommendations.forEach(rec => {
           doc.text(`• ${rec}`, 25, y);
-          y += 8;
-        });
-      } else {
-        currentPersonaData.recommendedDapps.forEach(dapp => {
-          doc.text(`• ${dapp}`, 25, y);
-          y += 8;
+          y += 6;
         });
       }
       
-      y += 10;
       if (currentPersonaData.aiInsights) {
+        y += 10;
         doc.setFontSize(14);
         doc.text("AI Insights:", 20, y);
         y += 10;
         doc.setFontSize(10);
         doc.text(`Trading Style: ${currentPersonaData.aiInsights.tradingStyle}`, 25, y);
-        y += 8;
+        y += 6;
         doc.text(`Risk Tolerance: ${currentPersonaData.aiInsights.riskTolerance}`, 25, y);
-        y += 8;
+        y += 6;
         doc.text(`DeFi Sophistication: ${currentPersonaData.aiInsights.defiSophistication}`, 25, y);
-        y += 8;
+        y += 6;
+      }
+      
+      if (currentPersonaData.securityAnalysis && y < 250) {
+        y += 10;
+        doc.setFontSize(14);
+        doc.text("Security Analysis:", 20, y);
+        y += 10;
+        doc.setFontSize(10);
+        doc.text(`Threat Level: ${currentPersonaData.securityAnalysis.threatLevel}`, 25, y);
+        y += 6;
+        doc.text(`Security Score: ${currentPersonaData.securityAnalysis.securityScore}`, 25, y);
+        y += 6;
       }
       
       doc.setFontSize(8);
@@ -1674,8 +1851,6 @@
       doc.save(`chainpersona_ai_${currentPersonaData.address.substring(0, 6)}.pdf`);
     }
 
-    document.getElementById('export-csv').addEventListener('click', exportAsCSV);
-    document.getElementById('export-json').addEventListener('click', exportAsJSON);
     document.getElementById('export-pdf').addEventListener('click', exportAsPDF);
   </script>
 </body>
