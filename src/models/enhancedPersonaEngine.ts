@@ -33,56 +33,56 @@ export class EnhancedPersonaEngine {
   
   private protocols: Record<string, Record<string, { name: string; category: string }>> = {
     ethereum: {
-      '0x7a250d5630b4cf539739df2c5dacb4c659f2488d': { name: 'Uniswap V2 Router', category: 'defi' },
-      '0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45': { name: 'Uniswap V3 Router', category: 'defi' },
-      '0xe592427a0aece92de3edee1f18e0157c05861564': { name: 'Uniswap V3 Router 2', category: 'defi' },
-      '0x00000000219ab540356cbb839cbe05303d7705fa': { name: 'Ethereum 2.0 Deposit', category: 'staking' },
-      '0x7be8076f4ea4a4ad08075c2508e481d6c946d12b': { name: 'OpenSea Registry', category: 'nft' },
-      '0x00000000006c3852cbef3e08e8df289169ede581': { name: 'OpenSea Seaport', category: 'nft' },
-      '0x7f268357a8c2552623316e2562d90e642bb538e5': { name: 'Rarible Exchange', category: 'nft' },
+      '0x7a250d5630b4cf539739df2c5dacb4c659f2488d': { name: 'Uniswap V2', category: 'defi' },
+      '0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45': { name: 'Uniswap V3', category: 'defi' },
+      '0xe592427a0aece92de3edee1f18e0157c05861564': { name: 'Uniswap V3', category: 'defi' },
+      '0x00000000219ab540356cbb839cbe05303d7705fa': { name: 'Ethereum 2.0 Staking', category: 'staking' },
+      '0x7be8076f4ea4a4ad08075c2508e481d6c946d12b': { name: 'OpenSea', category: 'nft' },
+      '0x00000000006c3852cbef3e08e8df289169ede581': { name: 'OpenSea', category: 'nft' },
+      '0x7f268357a8c2552623316e2562d90e642bb538e5': { name: 'Rarible', category: 'nft' },
       '0x06012c8cf97bead5deae237070f9587f8e7a266d': { name: 'CryptoKitties', category: 'gaming' },
       '0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb': { name: 'CryptoPunks', category: 'nft' },
-      '0xc0da01a04c3f3e0be433606045bb7017a7323e38': { name: 'Compound Governance', category: 'governance' },
-      '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2': { name: 'Maker Token', category: 'governance' },
-      '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643': { name: 'Compound cDAI', category: 'defi' },
-      '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5': { name: 'Compound cETH', category: 'defi' },
-      '0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9': { name: 'Aave Lending Pool', category: 'defi' },
-      '0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c': { name: 'Bancor Network', category: 'defi' },
-      '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f': { name: 'SushiSwap Router', category: 'defi' },
+      '0xc0da01a04c3f3e0be433606045bb7017a7323e38': { name: 'Compound', category: 'governance' },
+      '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2': { name: 'MakerDAO', category: 'governance' },
+      '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643': { name: 'Compound', category: 'defi' },
+      '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5': { name: 'Compound', category: 'defi' },
+      '0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9': { name: 'Aave', category: 'defi' },
+      '0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c': { name: 'Bancor', category: 'defi' },
+      '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f': { name: 'SushiSwap', category: 'defi' },
       '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': { name: 'WETH', category: 'defi' },
       '0xa0b86a33e6441e8c8c7014b37c88df5c5cc8c8c8': { name: 'Curve Finance', category: 'defi' },
-      '0x1111111254fb6c44bac0bed2854e76f90643097d': { name: '1inch Router', category: 'defi' },
+      '0x1111111254fb6c44bac0bed2854e76f90643097d': { name: '1inch', category: 'defi' },
       '0xdef1c0ded9bec7f1a1670819833240f027b25eff': { name: '0x Protocol', category: 'defi' },
     },
     polygon: {
-      '0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff': { name: 'QuickSwap Router', category: 'defi' },
-      '0x1b02da8cb0d097eb8d57a175b88c7d8b47997506': { name: 'SushiSwap Router', category: 'defi' },
-      '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063': { name: 'Aave Polygon', category: 'defi' },
-      '0x2791bca1f2de4661ed88a30c99a7a9449aa84174': { name: 'USDC Polygon', category: 'defi' },
+      '0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff': { name: 'QuickSwap', category: 'defi' },
+      '0x1b02da8cb0d097eb8d57a175b88c7d8b47997506': { name: 'SushiSwap', category: 'defi' },
+      '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063': { name: 'Aave', category: 'defi' },
+      '0x2791bca1f2de4661ed88a30c99a7a9449aa84174': { name: 'USDC', category: 'defi' },
       '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270': { name: 'WMATIC', category: 'defi' },
-      '0x60ae616a2155ee3d9a68541ba4544862310933d4': { name: 'OpenSea Polygon', category: 'nft' },
-      '0xc2132d05d31c914a87c6611c10748aeb04b58e8f': { name: 'USDT Polygon', category: 'defi' },
-      '0x831753dd7087cac61ab5644b308642cc1c33dc13': { name: 'QuickSwap Factory', category: 'defi' },
-      '0x1111111254fb6c44bac0bed2854e76f90643097d': { name: '1inch Router', category: 'defi' },
-      '0xf491e7b69e4244ad4002bc14e878a34207e38c29': { name: 'SpookySwap Router', category: 'defi' },
-      '0x5757371414417b8c6caad45baef941abc7d3ab32': { name: 'Curve Polygon', category: 'defi' },
-      '0x445fe580ef8d70ff569ab36e80c647af338db351': { name: 'Balancer Polygon', category: 'defi' },
+      '0x60ae616a2155ee3d9a68541ba4544862310933d4': { name: 'OpenSea', category: 'nft' },
+      '0xc2132d05d31c914a87c6611c10748aeb04b58e8f': { name: 'USDT', category: 'defi' },
+      '0x831753dd7087cac61ab5644b308642cc1c33dc13': { name: 'QuickSwap', category: 'defi' },
+      '0x1111111254fb6c44bac0bed2854e76f90643097d': { name: '1inch', category: 'defi' },
+      '0xf491e7b69e4244ad4002bc14e878a34207e38c29': { name: 'SpookySwap', category: 'defi' },
+      '0x5757371414417b8c6caad45baef941abc7d3ab32': { name: 'Curve Finance', category: 'defi' },
+      '0x445fe580ef8d70ff569ab36e80c647af338db351': { name: 'Balancer', category: 'defi' },
     },
     bsc: {
-      '0x10ed43c718714eb63d5aa57b78b54704e256024e': { name: 'PancakeSwap V2 Router', category: 'defi' },
-      '0x13f4ea83d0bd40e75c8222255bc855a974568dd4': { name: 'PancakeSwap V3 Router', category: 'defi' },
-      '0x58f876857a02d6762e0101bb5c46a8c1ed44dc16': { name: 'Venus Protocol', category: 'defi' },
-      '0x55d398326f99059ff775485246999027b3197955': { name: 'USDT BSC', category: 'defi' },
+      '0x10ed43c718714eb63d5aa57b78b54704e256024e': { name: 'PancakeSwap', category: 'defi' },
+      '0x13f4ea83d0bd40e75c8222255bc855a974568dd4': { name: 'PancakeSwap V3', category: 'defi' },
+      '0x58f876857a02d6762e0101bb5c46a8c1ed44dc16': { name: 'Venus', category: 'defi' },
+      '0x55d398326f99059ff775485246999027b3197955': { name: 'USDT', category: 'defi' },
       '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c': { name: 'WBNB', category: 'defi' },
-      '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d': { name: 'USDC BSC', category: 'defi' },
-      '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3': { name: 'DAI BSC', category: 'defi' },
-      '0x1111111254fb6c44bac0bed2854e76f90643097d': { name: '1inch Router', category: 'defi' },
-      '0xd99d1c33f9fc3444f8101754abc46c52416550d1': { name: 'PancakeSwap V1 Router', category: 'defi' },
-      '0x05ff2b0db69458a0750badebc4f9e13add608c7f': { name: 'PancakeSwap Factory', category: 'defi' },
-      '0x1b02da8cb0d097eb8d57a175b88c7d8b47997506': { name: 'SushiSwap BSC', category: 'defi' },
-      '0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae': { name: 'Biswap Router', category: 'defi' },
-      '0x3a6d8ca21d1cf76f653a67577fa0d27453350dd8': { name: 'BakerySwap Router', category: 'defi' },
-      '0xcf0febd3f17cef5b47b0cd257acf6025c5bff3b7': { name: 'ApeSwap Router', category: 'defi' },
+      '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d': { name: 'USDC', category: 'defi' },
+      '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3': { name: 'DAI', category: 'defi' },
+      '0x1111111254fb6c44bac0bed2854e76f90643097d': { name: '1inch', category: 'defi' },
+      '0xd99d1c33f9fc3444f8101754abc46c52416550d1': { name: 'PancakeSwap V1', category: 'defi' },
+      '0x05ff2b0db69458a0750badebc4f9e13add608c7f': { name: 'PancakeSwap', category: 'defi' },
+      '0x1b02da8cb0d097eb8d57a175b88c7d8b47997506': { name: 'SushiSwap', category: 'defi' },
+      '0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae': { name: 'Biswap', category: 'defi' },
+      '0x3a6d8ca21d1cf76f653a67577fa0d27453350dd8': { name: 'BakerySwap', category: 'defi' },
+      '0xcf0febd3f17cef5b47b0cd257acf6025c5bff3b7': { name: 'ApeSwap', category: 'defi' },
     }
   };
 
@@ -116,7 +116,7 @@ export class EnhancedPersonaEngine {
       behavioralTraits: [],
       recommendedDapps: [],
       conversationEnabled: true,
-      transactions: allTransactions // Include all transactions with real gas data
+      transactions: allTransactions
     };
     
     this.analyzeTransactionPatterns(basicPersona, transactions);
@@ -127,7 +127,7 @@ export class EnhancedPersonaEngine {
     
     basicPersona.archetypes = this.normalizeArchetypes(basicPersona.archetypes);
     
-    // AI-Enhanced Analysis
+    // AI-Enhanced Analysis using first API
     const walletData = {
       address,
       chain: this.chainType,
@@ -153,6 +153,7 @@ export class EnhancedPersonaEngine {
     return await this.aiService.chatWithWallet(question, walletData);
   }
 
+  // ONLY 3 API CALLS - for top 3 protocols with enhanced prompt engineering
   private async identifyTopThreeProtocolsWithAI(contractInteractions: any[]): Promise<string[]> {
     if (!contractInteractions.length) {
       return ['Uniswap V2 (25 txns)', 'OpenSea (12 txns)', 'Compound (8 txns)'];
@@ -170,36 +171,33 @@ export class EnhancedPersonaEngine {
     
     const sortedAddresses = Object.keys(interactionCounts)
       .sort((a, b) => interactionCounts[b] - interactionCounts[a])
-      .slice(0, 3);
+      .slice(0, 3); // ONLY TOP 3
     
-    console.log(`🔍 Top contracts to analyze:`, sortedAddresses.map(addr => `${addr.substring(0, 10)}... (${interactionCounts[addr]} txns)`));
+    console.log(`🔍 Analyzing top 3 protocols only`);
     
-    // Enhanced protocol identification with AI fallback
     const protocolPromises = sortedAddresses.map(async (addr) => {
       const count = interactionCounts[addr];
       const protocol = chainProtocols[addr];
       
       if (protocol) {
-        // Found in database - high confidence
         console.log(`✅ Database match: ${protocol.name}`);
         return `${protocol.name} (${count} txns)`;
       } else {
-        // Use AI to identify unknown protocol
+        // ENHANCED PROMPT ENGINEERING - Only for unknown protocols
         try {
           console.log(`🤖 AI analyzing: ${addr.substring(0, 10)}...`);
           const analysis = await this.aiService.analyzeProtocolByAddress(addr, count);
-          const displayName = analysis.confidence > 60 ? analysis.name : `Contract ${addr.substring(0, 8)}...`;
-          console.log(`🤖 AI identified: ${displayName} (${analysis.confidence}% confidence)`);
-          return `${displayName} (${count} txns)`;
+          console.log(`🤖 AI identified: ${analysis.name}`);
+          return `${analysis.name} (${count} txns)`;
         } catch (error) {
           console.error(`Failed to analyze protocol ${addr}:`, error);
-          return `Contract ${addr.substring(0, 8)}... (${count} txns)`;
+          return `Unknown Protocol (${count} txns)`;
         }
       }
     });
     
     const protocols = await Promise.all(protocolPromises);
-    console.log(`✅ Final protocol list:`, protocols);
+    console.log(`✅ Final protocol list (3 max):`, protocols);
     
     return protocols.length > 0 ? protocols : ['Uniswap V2 (25 txns)', 'OpenSea (12 txns)', 'Compound (8 txns)'];
   }

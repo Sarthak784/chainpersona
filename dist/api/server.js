@@ -10,7 +10,7 @@ const cors_1 = __importDefault(require("cors"));
 const path_1 = __importDefault(require("path"));
 const dataCollector_1 = require("../utils/dataCollector");
 const enhancedPersonaEngine_1 = require("../models/enhancedPersonaEngine");
-const enhancedProtocolAnalyzer_1 = require("../utils/enhancedProtocolAnalyzer");
+const detailedAnalysisService_1 = require("../utils/detailedAnalysisService");
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3000;
 app.use((0, cors_1.default)());
@@ -43,13 +43,13 @@ const personaEngines = {
     polygon: new enhancedPersonaEngine_1.EnhancedPersonaEngine(dataCollectors.polygon, process.env.GEMINI_API_KEY),
     bsc: new enhancedPersonaEngine_1.EnhancedPersonaEngine(dataCollectors.bsc, process.env.GEMINI_API_KEY)
 };
-let protocolAnalyzer = null;
+let detailedAnalysisService = null;
 if (process.env.GEMINI_ENHANCED_API_KEY) {
-    protocolAnalyzer = new enhancedProtocolAnalyzer_1.EnhancedProtocolAnalyzer(process.env.GEMINI_ENHANCED_API_KEY);
-    console.log('🔍 Enhanced Protocol Analyzer initialized');
+    detailedAnalysisService = new detailedAnalysisService_1.DetailedAnalysisService(process.env.GEMINI_ENHANCED_API_KEY);
+    console.log('🔍 Detailed Analysis Service initialized');
 }
 else {
-    console.log('⚠️ Enhanced Protocol Analyzer disabled - GEMINI_ENHANCED_API_KEY not found');
+    console.log('⚠️ Detailed Analysis Service disabled - GEMINI_ENHANCED_API_KEY not found');
 }
 console.log('🚀 Initialized data collectors for:', Object.keys(dataCollectors).join(', '));
 app.get('/api/health', (req, res) => {
@@ -57,11 +57,11 @@ app.get('/api/health', (req, res) => {
         status: 'healthy',
         chains: Object.keys(dataCollectors),
         ai: !!process.env.GEMINI_API_KEY,
-        enhancedProtocolAnalysis: !!protocolAnalyzer,
+        detailedAnalysis: !!detailedAnalysisService,
         features: {
-            transactionHistory: true,
-            protocolIdentification: !!protocolAnalyzer,
+            protocolIdentification: true,
             smartChatbot: true,
+            detailedAnalysis: !!detailedAnalysisService,
             multiChain: true
         }
     });
@@ -93,28 +93,24 @@ app.get('/api/persona/:chain/:address', async (req, res) => {
         });
     }
 });
-app.post('/api/analyze-protocols', async (req, res) => {
+app.post('/api/detailed-analysis', async (req, res) => {
     try {
-        const { contracts, chain } = req.body;
-        if (!protocolAnalyzer) {
+        const { walletData } = req.body;
+        if (!detailedAnalysisService) {
             return res.status(400).json({
-                error: 'Enhanced protocol analysis not available',
+                error: 'Detailed analysis not available',
                 message: 'GEMINI_ENHANCED_API_KEY not configured'
             });
         }
-        if (!Array.isArray(contracts) || contracts.length === 0) {
-            return res.status(400).json({ error: 'Invalid contracts array' });
-        }
-        console.log(`🔍 Analyzing ${contracts.length} protocols on ${chain}`);
-        const results = await protocolAnalyzer.batchAnalyzeContracts(contracts, chain);
-        const protocolData = Object.fromEntries(results);
-        console.log(`✅ Protocol analysis complete for ${contracts.length} contracts`);
-        res.json(protocolData);
+        console.log(`🔍 Generating detailed analysis for ${walletData.address}`);
+        const detailedAnalysis = await detailedAnalysisService.generateDetailedAnalysis(walletData);
+        console.log(`✅ Detailed analysis complete`);
+        res.json(detailedAnalysis);
     }
     catch (error) {
-        console.error('❌ Protocol analysis error:', error);
+        console.error('❌ Detailed analysis error:', error);
         res.status(500).json({
-            error: 'Protocol analysis failed',
+            error: 'Detailed analysis failed',
             message: error.message
         });
     }
@@ -139,43 +135,14 @@ app.post('/api/chat/:chain/:address', async (req, res) => {
         });
     }
 });
-app.get('/api/test/:chain/:address', async (req, res) => {
-    try {
-        const { chain, address } = req.params;
-        if (!dataCollectors[chain]) {
-            return res.status(400).json({ error: 'Unsupported chain' });
-        }
-        const collector = dataCollectors[chain];
-        const [transactions, tokens] = await Promise.all([
-            collector.getWalletTransactions(address, 5),
-            collector.getTokenBalances(address)
-        ]);
-        res.json({
-            chain,
-            address,
-            transactionCount: transactions.length,
-            tokenCount: tokens.erc20.length,
-            sampleTransaction: transactions[0] || null,
-            status: 'success'
-        });
-    }
-    catch (error) {
-        console.error('❌ Test error:', error);
-        res.status(500).json({
-            error: 'Test failed',
-            message: error.message
-        });
-    }
-});
 app.get('*', (req, res) => {
     res.sendFile(path_1.default.join(__dirname, '../../public/index.html'));
 });
 app.listen(PORT, () => {
     console.log(`🌟 ChainPersona AI server running on port ${PORT}`);
     console.log(`🔗 Supported chains: ${Object.keys(dataCollectors).join(', ')}`);
-    console.log(`🤖 AI features: ${process.env.GEMINI_API_KEY ? 'Enabled' : 'Disabled'}`);
-    console.log(`🔍 Enhanced Protocol Analysis: ${protocolAnalyzer ? 'Enabled' : 'Disabled'}`);
-    console.log(`📊 Transaction History: Enabled`);
-    console.log(`💬 Smart Chatbot: Enabled`);
+    console.log(`🤖 First Gemini API (Protocols + Chat): ${process.env.GEMINI_API_KEY ? 'Enabled' : 'Disabled'}`);
+    console.log(`🔍 Second Gemini API (Detailed Analysis): ${detailedAnalysisService ? 'Enabled' : 'Disabled'}`);
+    console.log(`📊 Transaction History: Enabled (No API calls for protocol names)`);
 });
 //# sourceMappingURL=server.js.map
