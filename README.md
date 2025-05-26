@@ -44,11 +44,3 @@ cat > README.md << 'EOF'
 - **Real-time Updates** - Live data fetching and processing
 - **Optimized Performance** - Maximum 5 API calls per analysis
 
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 16+ and npm
-- API keys for blockchain data (see setup below)
-
-### Installation
-
