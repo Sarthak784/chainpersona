@@ -24,6 +24,7 @@ export interface EnhancedWalletPersona {
   aiInsights: WalletInsights;
   conversationEnabled: boolean;
   transactions: any[];
+  portfolioValue: number; // NEW: Real portfolio value
 }
 
 export class EnhancedPersonaEngine {
@@ -98,6 +99,9 @@ export class EnhancedPersonaEngine {
     // Reset AI call count for new analysis
     this.aiService.resetChatUsage();
     
+    // Get real portfolio value FIRST
+    const realPortfolioValue = await (this.dataCollector as any).getRealPortfolioValue(address);
+    
     const transactions = await this.dataCollector.getWalletTransactions(address, 200);
     const tokenBalances = await this.dataCollector.getTokenBalances(address);
     const contractInteractions = await this.dataCollector.getContractInteractions(address);
@@ -116,7 +120,8 @@ export class EnhancedPersonaEngine {
       behavioralTraits: [],
       recommendedDapps: [],
       conversationEnabled: true,
-      transactions: allTransactions
+      transactions: allTransactions,
+      portfolioValue: realPortfolioValue // REAL portfolio value
     };
     
     this.analyzeTransactionPatterns(basicPersona, transactions);
@@ -135,6 +140,7 @@ export class EnhancedPersonaEngine {
       activityLevel: basicPersona.activityLevel,
       securityScore: basicPersona.securityScore,
       topProtocols: basicPersona.topProtocols,
+      portfolioValue: realPortfolioValue,
       tokenCount: Array.isArray(tokenBalances.erc20) ? tokenBalances.erc20.length : 0,
       nftCount: Array.isArray(tokenBalances.erc721) ? tokenBalances.erc721.length : 0,
     };

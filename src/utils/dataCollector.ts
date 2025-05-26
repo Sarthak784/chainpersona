@@ -1,9 +1,17 @@
 import { IDataCollector } from './dataCollector.interface';
 
-// Type guard for API response
 interface ApiResponse {
   status: string;
-  result: any[];
+  result: any;
+  data?: any;
+}
+
+interface CoinbaseResponse {
+  data: {
+    rates: {
+      USD: string;
+    };
+  };
 }
 
 function isValidApiResponse(data: unknown): data is ApiResponse {
@@ -11,8 +19,21 @@ function isValidApiResponse(data: unknown): data is ApiResponse {
     typeof data === 'object' &&
     data !== null &&
     'status' in data &&
-    'result' in data &&
-    Array.isArray((data as any).result)
+    'result' in data
+  );
+}
+
+function isValidCoinbaseResponse(data: unknown): data is CoinbaseResponse {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'data' in data &&
+    typeof (data as any).data === 'object' &&
+    (data as any).data !== null &&
+    'rates' in (data as any).data &&
+    typeof (data as any).data.rates === 'object' &&
+    (data as any).data.rates !== null &&
+    'USD' in (data as any).data.rates
   );
 }
 
@@ -44,6 +65,134 @@ export class DataCollector implements IDataCollector {
     return this.baseUrls[this.chainType];
   }
 
+  // NEW: Get real portfolio value using Coinbase API (free)
+  async getRealPortfolioValue(address: string): Promise<number> {
+    try {
+      console.log(`💰 Calculating real portfolio value for ${address}`);
+      
+      // Get token balances
+      const tokenBalances = await this.getTokenBalances(address);
+      const erc20Tokens = tokenBalances.erc20 || [];
+      
+      let totalValue = 0;
+      
+      // Get ETH balance first
+      const ethValue = await this.getETHBalance(address);
+      totalValue += ethValue;
+      
+      // Get major token prices (top tokens only to avoid API spam)
+      const majorTokens = this.getMajorTokens(erc20Tokens);
+      
+      for (const token of majorTokens) {
+        try {
+          const price = await this.getTokenPrice(token.symbol);
+          const balance = parseFloat(token.balance || '0') / Math.pow(10, token.decimals);
+          const tokenValue = balance * price;
+          totalValue += tokenValue;
+          
+          console.log(`💎 ${token.symbol}: ${balance.toFixed(4)} × $${price} = $${tokenValue.toFixed(2)}`);
+        } catch (error) {
+          console.log(`⚠️ Could not get price for ${token.symbol}`);
+        }
+      }
+      
+      console.log(`✅ Total portfolio value: $${totalValue.toFixed(2)}`);
+      return totalValue;
+      
+    } catch (error) {
+      console.error('❌ Error calculating portfolio value:', error);
+      return 0;
+    }
+  }
+
+  // Get ETH balance in USD
+  private async getETHBalance(address: string): Promise<number> {
+    try {
+      const response = await fetch(
+        `${this.getBaseUrl()}?module=account&action=balance&address=${address}&tag=latest&apikey=${this.apiKey}`
+      );
+      
+      const data: unknown = await response.json();
+      
+      if (!isValidApiResponse(data)) {
+        console.log(`Invalid API response format from ${this.chainType}`);
+        return 0;
+      }
+
+      if (data.status === '1') {
+        const ethBalance = parseFloat(data.result) / Math.pow(10, 18);
+        const ethPrice = await this.getTokenPrice('ETH');
+        const ethValue = ethBalance * ethPrice;
+        
+        console.log(`⟠ ETH: ${ethBalance.toFixed(4)} × $${ethPrice} = $${ethValue.toFixed(2)}`);
+        return ethValue;
+      }
+      return 0;
+    } catch (error) {
+      console.error('Error getting ETH balance:', error);
+      return 0;
+    }
+  }
+
+  // Filter to major tokens only (to avoid too many API calls)
+  private getMajorTokens(tokens: any[]): any[] {
+    const majorSymbols = ['USDC', 'USDT', 'DAI', 'WETH', 'UNI', 'LINK', 'AAVE', 'COMP', 'MKR', 'MATIC', 'BNB'];
+    return tokens.filter(token => majorSymbols.includes(token.symbol)).slice(0, 5); // Max 5 tokens
+  }
+
+  // Get token price from Coinbase (free API)
+  private async getTokenPrice(symbol: string): Promise<number> {
+    try {
+      // Map symbols to Coinbase format
+      const symbolMap: Record<string, string> = {
+        'ETH': 'ETH',
+        'WETH': 'ETH',
+        'USDC': 'USDC',
+        'USDT': 'USDT',
+        'DAI': 'DAI',
+        'UNI': 'UNI',
+        'LINK': 'LINK',
+        'AAVE': 'AAVE',
+        'COMP': 'COMP',
+        'MKR': 'MKR',
+        'MATIC': 'MATIC',
+        'BNB': 'BNB'
+      };
+
+      const coinbaseSymbol = symbolMap[symbol] || symbol;
+      
+      const response = await fetch(
+        `https://api.coinbase.com/v2/exchange-rates?currency=${coinbaseSymbol}`
+      );
+      
+      const data: unknown = await response.json();
+
+      if (isValidCoinbaseResponse(data)) {
+        return parseFloat(data.data.rates.USD);
+      }
+      
+      throw new Error(`Price not found for ${symbol}`);
+    } catch (error) {
+      console.log(`Could not get price for ${symbol}, using fallback`);
+      // Fallback prices for major tokens
+      const fallbackPrices: Record<string, number> = {
+        'ETH': 2500,
+        'WETH': 2500,
+        'USDC': 1,
+        'USDT': 1,
+        'DAI': 1,
+        'UNI': 8,
+        'LINK': 15,
+        'AAVE': 100,
+        'COMP': 50,
+        'MKR': 1200,
+        'MATIC': 0.8,
+        'BNB': 300
+      };
+      return fallbackPrices[symbol] || 0;
+    }
+  }
+
   async getTokenBalances(address: string) {
     try {
       console.log(`📊 Fetching ${this.chainType} token balances for ${address}`);
@@ -68,21 +217,35 @@ export class DataCollector implements IDataCollector {
         return { erc20: [], erc721: [] };
       }
       
-      const uniqueTokens = new Map();
+      // Calculate actual balances from transactions
+      const balanceMap = new Map();
+      
       data.result.forEach((tx: any) => {
-        if (!uniqueTokens.has(tx.contractAddress)) {
-          uniqueTokens.set(tx.contractAddress, {
+        const contractAddress = tx.contractAddress.toLowerCase();
+        const value = parseFloat(tx.value || '0');
+        const isIncoming = tx.to.toLowerCase() === address.toLowerCase();
+        
+        if (!balanceMap.has(contractAddress)) {
+          balanceMap.set(contractAddress, {
             contractAddress: tx.contractAddress,
             symbol: tx.tokenSymbol,
             name: tx.tokenName,
-            decimals: parseInt(tx.tokenDecimal) || 18
+            decimals: parseInt(tx.tokenDecimal) || 18,
+            balance: '0'
           });
         }
+        
+        const token = balanceMap.get(contractAddress);
+        const currentBalance = parseFloat(token.balance);
+        token.balance = (currentBalance + (isIncoming ? value : -value)).toString();
       });
       
-      const erc20Tokens = Array.from(uniqueTokens.values());
+      // Filter tokens with positive balances
+      const erc20Tokens = Array.from(balanceMap.values()).filter(
+        token => parseFloat(token.balance) > 0
+      );
       
-      console.log(`✅ Found ${erc20Tokens.length} unique tokens on ${this.chainType}`);
+      console.log(`✅ Found ${erc20Tokens.length} tokens with positive balances on ${this.chainType}`);
       
       return {
         erc20: erc20Tokens,
@@ -98,25 +261,11 @@ export class DataCollector implements IDataCollector {
     try {
       console.log(`📈 Fetching ${maxCount} ${this.chainType} transactions for ${address}`);
       
-      const response = await fetch(
-        `${this.getBaseUrl()}?module=account&action=txlist&address=${address}&startblock=0&endblock=999999999&page=1&offset=${Math.min(maxCount, 100)}&sort=desc&apikey=${this.apiKey}`
-      );
-      
-      if (!response.ok) {
-        throw new Error(`${this.chainType} API error: ${response.status}`);
-      }
-      
-      const data: unknown = await response.json();
-      
-      if (!isValidApiResponse(data)) {
-        console.log(`Invalid API response format from ${this.chainType}`);
-        return [];
-      }
-      
-      if (data.status !== '1') {
-        console.log(`No transactions found on ${this.chainType}`);
-        return [];
-      }
+      // Fetch both regular transactions and token transfers
+      const [regularResponse, tokenResponse] = await Promise.all([
+        fetch(`${this.getBaseUrl()}?module=account&action=txlist&address=${address}&startblock=0&endblock=999999999&page=1&offset=${Math.min(maxCount, 100)}&sort=desc&apikey=${this.apiKey}`),
+        fetch(`${this.getBaseUrl()}?module=account&action=tokentx&address=${address}&startblock=0&endblock=999999999&page=1&offset=50&sort=desc&apikey=${this.apiKey}`)
+      ]);
       
       const nativeTokens = {
         ethereum: { symbol: 'ETH', name: 'Ethereum' },
@@ -125,28 +274,66 @@ export class DataCollector implements IDataCollector {
       };
       
       const nativeToken = nativeTokens[this.chainType as keyof typeof nativeTokens];
+      let allTransactions: any[] = [];
       
-      const formattedTransactions = data.result.map((tx: any) => {
-        console.log(`🔍 Transaction gas data:`, { gasUsed: tx.gasUsed, gasPrice: tx.gasPrice, hash: tx.hash.substring(0, 10) });
-        return {
-          hash: tx.hash,
-          from: tx.from,
-          to: tx.to,
-          value: tx.value,
-          timeStamp: tx.timeStamp,
-          blockNumber: tx.blockNumber,
-          gasUsed: tx.gasUsed || '0', // ✅ Real gas data from external transactions
-          gasPrice: tx.gasPrice || '0', // ✅ Real gas price data
-          contractAddress: tx.contractAddress || '',
-          tokenSymbol: nativeToken.symbol,
-          tokenName: nativeToken.name,
-          category: 'external',
-          isError: tx.isError || '0'
-        };
-      });
+      // Process regular transactions
+      if (regularResponse.ok) {
+        const regularData: unknown = await regularResponse.json();
+        if (isValidApiResponse(regularData) && regularData.status === '1') {
+          const formattedTransactions = regularData.result.map((tx: any) => {
+            console.log(`🔍 Regular transaction gas data:`, { gasUsed: tx.gasUsed, gasPrice: tx.gasPrice, hash: tx.hash.substring(0, 10) });
+            return {
+              hash: tx.hash,
+              from: tx.from,
+              to: tx.to,
+              value: tx.value,
+              timeStamp: tx.timeStamp,
+              blockNumber: tx.blockNumber,
+              gasUsed: tx.gasUsed || '0',
+              gasPrice: tx.gasPrice || '0',
+              contractAddress: tx.contractAddress || '',
+              tokenSymbol: nativeToken.symbol,
+              tokenName: nativeToken.name,
+              tokenDecimal: '18',
+              category: 'external',
+              isError: tx.isError || '0'
+            };
+          });
+          allTransactions = allTransactions.concat(formattedTransactions);
+        }
+      }
       
-      console.log(`✅ Fetched ${formattedTransactions.length} ${this.chainType} transactions`);
-      return formattedTransactions;
+      // Process token transfers
+      if (tokenResponse.ok) {
+        const tokenData: unknown = await tokenResponse.json();
+        if (isValidApiResponse(tokenData) && tokenData.status === '1') {
+          const tokenTransactions = tokenData.result.map((tx: any) => ({
+            hash: tx.hash,
+            from: tx.from,
+            to: tx.to,
+            value: tx.value,
+            timeStamp: tx.timeStamp,
+            blockNumber: tx.blockNumber,
+            gasUsed: tx.gasUsed || '21000',
+            gasPrice: tx.gasPrice || '20000000000',
+            contractAddress: tx.contractAddress,
+            tokenSymbol: tx.tokenSymbol || 'TOKEN',
+            tokenName: tx.tokenName || 'Unknown Token',
+            tokenDecimal: tx.tokenDecimal || '18',
+            category: 'erc20',
+            isError: '0'
+          }));
+          allTransactions = allTransactions.concat(tokenTransactions);
+        }
+      }
+      
+      // Remove duplicates and sort by timestamp
+      const uniqueTransactions = Array.from(
+        new Map(allTransactions.map(tx => [tx.hash, tx])).values()
+      ).sort((a, b) => parseInt(b.timeStamp) - parseInt(a.timeStamp));
+      
+      console.log(`✅ Fetched ${uniqueTransactions.length} total transactions (${allTransactions.filter(tx => tx.category === 'external').length} regular, ${allTransactions.filter(tx => tx.category === 'erc20').length} token)`);
+      return uniqueTransactions;
     } catch (error) {
       console.error(`❌ Error fetching ${this.chainType} transactions:`, error);
       return [];
@@ -187,11 +374,12 @@ export class DataCollector implements IDataCollector {
                 value: tx.value,
                 timeStamp: tx.timeStamp,
                 blockNumber: tx.blockNumber,
-                gasUsed: tx.gasUsed || '0', // ✅ Real gas data
-                gasPrice: tx.gasPrice || '0', // ✅ Real gas price
+                gasUsed: tx.gasUsed || '0',
+                gasPrice: tx.gasPrice || '0',
                 contractAddress: tx.to,
                 tokenSymbol: nativeToken.symbol,
                 tokenName: nativeToken.name,
+                tokenDecimal: '18',
                 category: 'internal',
                 isError: tx.isError || '0'
               };
@@ -214,18 +402,19 @@ export class DataCollector implements IDataCollector {
               value: tx.value,
               timeStamp: tx.timeStamp,
               blockNumber: tx.blockNumber,
-              gasUsed: tx.gasUsed || '21000', // Default gas for internal
-              gasPrice: tx.gasPrice || '20000000000', // Default gas price
+              gasUsed: tx.gasUsed || '21000',
+              gasPrice: tx.gasPrice || '20000000000',
               contractAddress: tx.to,
               tokenSymbol: nativeToken.symbol,
               tokenName: nativeToken.name,
+              tokenDecimal: '18',
               category: 'internal',
               isError: tx.isError || '0'
             }));
           
           // Only add internal transactions that aren't already in external
           const existingHashes = new Set(contractInteractions.map(tx => tx.hash));
-          const newInternalTxs = internalTxs.filter(tx => !existingHashes.has(tx.hash));
+          const newInternalTxs = internalTxs.filter((tx: any) => !existingHashes.has(tx.hash));
           contractInteractions = contractInteractions.concat(newInternalTxs);
         }
       }
