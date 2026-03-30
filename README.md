@@ -10,7 +10,6 @@
 
 > Transform any wallet address into a comprehensive behavioral analysis using advanced AI and blockchain data intelligence.
 
-![ChainPersona AI Demo](https://via.placeholder.com/800x400/4e54c8/ffffff?text=ChainPersona+AI+Demo)
 
 ## ✨ Features
 
